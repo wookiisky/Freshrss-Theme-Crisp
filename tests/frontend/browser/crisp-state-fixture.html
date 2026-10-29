@@ -5,8 +5,10 @@
 <style>
 #fixture-controls, #fixture-navigation, #fixture-articles { margin: 24px; }
 #fixture-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
-#fixture-navigation { width: 260px; }
+#fixture-navigation, #fixture-tree { width: 260px; }
+#fixture-tree { margin: 24px; }
 </style></head><body class="normal">
+<header class="header" aria-label="Toolbar"></header>
 <section id="fixture-controls">
   <div class="group">
     <button id="ordinary" class="btn"><img class="icon" src="themes/icons/read.svg" alt="Read"> Ordinary</button>
@@ -26,7 +28,17 @@
     <ul class="dropdown-menu"><li class="item"><a id="menu-action" href="#">Menu action</a></li></ul>
   </div>
 </section>
-<nav id="fixture-navigation" class="nav-list"><ul><li class="item active"><a id="nav-selected" href="#">Selected navigation</a></li><li class="item"><a href="#">Other navigation</a></li></ul></nav>
+<nav id="fixture-navigation" class="nav-list"><ul><li id="nav-selected-item" class="item active"><a id="nav-selected" href="#">Selected navigation</a></li><li class="item"><a id="nav-ordinary" href="#">Other navigation</a></li></ul></nav>
+<!-- Category and feed hierarchy follows app/layout/aside_feed.phtml. -->
+<ul id="fixture-tree" class="tree">
+  <li id="folder-selected" class="tree-folder category active">
+    <a id="folder-title" class="tree-folder-title" href="#"><button class="dropdown-toggle" title="Expand"><img class="icon" src="themes/icons/up.svg" alt=""></button><span class="title" data-unread="3">Selected category</span></a>
+    <ul class="tree-folder-items active">
+      <li id="feed-selected" class="item feed active" data-unread="3"><a class="item-title" href="#" data-unread="3"><span class="title">Selected feed</span></a></li>
+      <li id="feed-ordinary" class="item feed" data-unread="0"><a class="item-title" href="#" data-unread="0"><span class="title">Other feed</span></a></li>
+    </ul>
+  </li>
+</ul>
 <main id="fixture-articles">
 <article id="article" class="flux current favorite not_read">
   <ul class="horizontal-list flux_header websiteName has-date">

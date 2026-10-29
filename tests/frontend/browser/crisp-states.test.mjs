@@ -90,6 +90,104 @@ async function colour(page, role) {
 for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 	const label = `${theme}/${direction}`;
 
+	test(`${label}: read and unread remain distinct and the header has a clear divider`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			await page.locator('#article').evaluate(article => article.classList.remove('current', 'favorite'));
+			const unread = await renderedBackground(page, '#article .flux_header');
+			const title = page.locator('#article .title');
+			assert.equal(await title.evaluate(element => getComputedStyle(element).fontWeight), '400');
+			await page.locator('#article').evaluate(article => article.classList.remove('not_read'));
+			const read = await renderedBackground(page, '#article .flux_header');
+			assert.ok(contrast(unread, read) >= 1.3, 'unread fill separates from read fill');
+			assert.equal(await title.evaluate(element => getComputedStyle(element).fontWeight), '400');
+			assert.equal((await appearance(page, '#article .title')).color, await colour(page, 'muted'));
+			await page.locator('#article .flux_header').hover();
+			assert.ok(contrast((await appearance(page, '#article .title')).color, await renderedBackground(page, '#article .flux_header')) >= 4.5);
+			await page.locator('#article').evaluate(article => article.classList.add('current', 'favorite', 'not_read'));
+			assert.equal(await title.evaluate(element => getComputedStyle(element).fontWeight), '400', 'unread keeps the same weight even when current and favorite');
+			assert.equal((await appearance(page, '#article .flux_header')).backgroundColor, await colour(page, 'selected'));
+			const divider = await page.locator('.header').evaluate(element => {
+				const style = getComputedStyle(element);
+				return { width: parseFloat(style.borderBottomWidth), color: style.borderBottomColor, style: style.borderBottomStyle };
+			});
+			assert.ok(divider.width >= 2);
+			assert.equal(divider.style, 'solid');
+			for (const role of ['surface', 'bg', 'raised', 'unread']) assert.ok(contrast(divider.color, await colour(page, role)) >= 3, `header divider against ${role}`);
+		} finally { await page.close(); }
+	});
+
+	test(`${label}: rendered hover, selection and press have distinct cues without moving content`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			for (const [ordinary, selected] of [['#ordinary', '#selected'], ['#nav-ordinary', '#nav-selected'], ['#feed-ordinary', '#feed-selected']]) {
+				const normal = await renderedBackground(page, ordinary);
+				const bounds = await page.locator(ordinary).boundingBox();
+				await page.locator(ordinary).hover();
+				const hover = await renderedBackground(page, ordinary);
+				assert.ok(contrast(normal, hover) >= 1.6, `${ordinary} hover separates from its normal background`);
+				assert.ok(contrast(hover, await renderedBackground(page, selected)) >= 1.15, `${selected} separates from hover`);
+				if (ordinary === '#ordinary') {
+					// Apply the actual CSS filter to an opaque pixel, as the monochrome icons do.
+					const iconColour = await page.locator('#ordinary .icon').evaluate(icon => {
+						const source = document.createElement('canvas');
+						source.width = source.height = 1;
+						source.getContext('2d').fillRect(0, 0, 1, 1);
+						const output = document.createElement('canvas');
+						output.width = output.height = 1;
+						const context = output.getContext('2d');
+						context.filter = getComputedStyle(icon).filter;
+						context.drawImage(source, 0, 0);
+						return `rgb(${[...context.getImageData(0, 0, 1, 1).data].slice(0, 3).join(', ')})`;
+					});
+					assert.ok(contrast(iconColour, hover) >= 3, 'filtered hover icon remains visible against its fill');
+				}
+				assert.deepEqual(await page.locator(ordinary).boundingBox(), bounds, `${ordinary} hover does not move or resize content`);
+			}
+			const selected = page.locator('#selected');
+			await selected.hover();
+			const bounds = await selected.boundingBox();
+			assert.equal((await appearance(page, '#selected')).boxShadow, 'none');
+			await page.mouse.down();
+			assert.equal((await appearance(page, '#selected')).boxShadow, `${await colour(page, 'accent-hover')} 0px 0px 0px 2px inset`);
+			assert.deepEqual(await selected.boundingBox(), bounds, 'pressing selected controls does not shift their bounds');
+			await page.mouse.up();
+		} finally { await page.close(); }
+	});
+
+	test(`${label}: selected navigation uses one leading marker on desktop and narrow screens`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			const offset = direction === 'rtl' ? '-3px' : '3px';
+			for (const width of [1440, 390]) {
+				await page.setViewportSize({ width, height: 900 });
+				const navigation = await page.locator('#nav-selected').boundingBox();
+				const navigationItem = await page.locator('#nav-selected-item').boundingBox();
+				assert.ok(navigation.x >= navigationItem.x && navigation.x + navigation.width <= navigationItem.x + navigationItem.width,
+					`navigation marker stays inside its clipping parent at ${width}px`);
+				for (const [selector, stateOwner, duplicate] of [
+					['#nav-selected', '#nav-selected-item', '#nav-selected-item'],
+					['#folder-title', '#folder-selected', '#folder-selected'],
+					['#feed-selected', '#feed-selected', '#feed-selected > a'],
+				]) {
+					const selected = page.locator(selector);
+					const selectedStyle = await appearance(page, selector);
+					assert.equal(selectedStyle.boxShadow, `${await colour(page, 'accent')} ${offset} 0px 0px 0px inset`, `${selector} marker faces the reading start at ${width}px`);
+					assert.equal((await appearance(page, duplicate)).boxShadow, 'none', `${selector} marker is not duplicated`);
+					await selected.hover();
+					assert.equal((await appearance(page, selector)).boxShadow, selectedStyle.boxShadow);
+					assert.equal((await appearance(page, selector)).backgroundColor, selectedStyle.backgroundColor);
+					// Hover may scroll a clipped ancestor; measure the selection change after that scroll.
+					const bounds = await selected.boundingBox();
+					await page.locator(stateOwner).evaluate(element => element.classList.remove('active'));
+					assert.equal((await appearance(page, selector)).boxShadow, 'none', 'marker belongs only to selection');
+					assert.deepEqual(await selected.boundingBox(), bounds, 'selection marker does not move or resize content');
+					await page.locator(stateOwner).evaluate(element => element.classList.add('active'));
+				}
+			}
+		} finally { await page.close(); }
+	});
+
 	test(`${label}: current, favorite and unread keep independent visual cues`, async () => {
 		const page = await openFixture(theme, direction);
 		try {
@@ -107,21 +205,33 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 		} finally { await page.close(); }
 	});
 
-	test(`${label}: selected controls and navigation survive hover`, async () => {
+	test(`${label}: button selection changes only the border and still allows hover feedback`, async () => {
 		const page = await openFixture(theme, direction);
 		try {
-			for (const selector of ['#selected', '#nav-selected']) {
-				const beforeHover = await appearance(page, selector);
-				await page.locator(selector).hover();
-				assert.equal((await appearance(page, selector)).backgroundColor, beforeHover.backgroundColor);
-				assert.equal(beforeHover.backgroundColor, await colour(page, 'selected'));
-			}
+			const ordinary = await appearance(page, '#ordinary');
+			const selected = await appearance(page, '#selected');
+			assert.equal(selected.borderColor, await colour(page, 'accent'));
+			assert.notEqual(selected.borderColor, ordinary.borderColor);
+			assert.deepEqual({ ...selected, borderColor: ordinary.borderColor }, ordinary);
+			assert.equal((await appearance(page, '#selected .icon')).filter, (await appearance(page, '#ordinary .icon')).filter);
+			await page.locator('#selected').hover();
+			assert.equal((await appearance(page, '#selected')).backgroundColor, await colour(page, 'hover'));
+			const menuBefore = await appearance(page, '#menu-toggle');
 			await page.locator('#menu-toggle').click();
-			assert.equal((await appearance(page, '#menu-toggle')).backgroundColor, await colour(page, 'selected'));
 			assert.ok(await page.locator('#menu-action').isVisible());
-			await page.locator('#menu-toggle').evaluate(element => element.classList.add('disabled'));
+			await page.mouse.move(0, 0);
+			const menuOpen = await appearance(page, '#menu-toggle');
+			for (const property of ['backgroundColor', 'color', 'boxShadow']) assert.equal(menuOpen[property], menuBefore[property]);
+			assert.equal(menuOpen.borderColor, await colour(page, 'accent'));
 			await page.locator('#menu-toggle').hover();
-			assert.equal((await appearance(page, '#menu-toggle')).backgroundColor, await colour(page, 'selected'));
+			assert.equal((await appearance(page, '#menu-toggle')).backgroundColor, await colour(page, 'hover'));
+			await page.mouse.down();
+			assert.equal((await appearance(page, '#menu-toggle')).boxShadow, `${await colour(page, 'accent-hover')} 0px 0px 0px 2px inset`, 'open menu keeps distinct press feedback');
+			await page.mouse.up();
+			await page.locator('#menu-toggle').evaluate(element => element.classList.add('disabled'));
+			const disabled = await appearance(page, '#menu-toggle');
+			assert.equal(disabled.backgroundColor, await colour(page, 'raised'));
+			assert.equal(disabled.borderColor, await colour(page, 'accent'));
 		} finally { await page.close(); }
 	});
 
@@ -133,7 +243,9 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 				await page.locator(selector).hover();
 				assert.deepEqual(await appearance(page, selector), beforeHover);
 				if (['#selected-disabled', '#class-disabled'].includes(selector)) {
-					assert.equal(beforeHover.backgroundColor, await colour(page, 'selected'));
+					assert.equal(beforeHover.backgroundColor, await colour(page, 'raised'));
+					assert.equal(beforeHover.borderColor, await colour(page, 'accent'));
+					assert.equal(beforeHover.boxShadow, 'none');
 					assert.equal(beforeHover.opacity, '1', 'selection must not be faded into its parent');
 				}
 			}
@@ -174,7 +286,7 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 				const style = await appearance(page, selector);
 				assert.equal(style.outlineStyle, 'solid');
 				assert.ok(parseFloat(style.outlineWidth) >= 2);
-				if (selector === '#selected') assert.equal(style.backgroundColor, await colour(page, 'selected'));
+				if (selector === '#selected') assert.equal(style.backgroundColor, await colour(page, 'raised'));
 				const clipped = await focusClipped(page, selector);
 				assert.equal(clipped, false, `${selector} focus is clipped`);
 			}
@@ -203,7 +315,7 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 	test(`${label}: rendered text, control edges and focus have sufficient contrast`, async () => {
 		const page = await openFixture(theme, direction);
 		try {
-			for (const selector of ['#ordinary', '#selected', '#primary', '#danger', '#selected-disabled', '#source']) {
+			for (const selector of ['#ordinary', '#selected', '#primary', '#danger', '#selected-disabled', '#source', '#nav-selected', '#folder-title', '#feed-selected > a']) {
 				const style = await appearance(page, selector);
 				const background = await renderedBackground(page, selector);
 				assert.ok(contrast(style.color, background) >= 4.5, `${selector} text against its rendered background`);

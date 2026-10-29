@@ -6,17 +6,19 @@
 	--crisp-surface: #fff;
 	--crisp-sidebar: #f6f4f0;
 	--crisp-raised: #f2efea;
-	--crisp-hover: #f7f2ec;
+	--crisp-hover: #c6b9a9;
 	--crisp-text: #302a25;
-	--crisp-muted: #706258;
+	--crisp-muted: #514338;
 	/* Quiet separators and stronger control outlines serve different roles. */
 	--crisp-border: #e9e4dd;
-	--crisp-control-border: #8c7f73;
-	--crisp-accent: #c2410c;
-	--crisp-accent-hover: #9a3412;
+	--crisp-control-border: #6f6256;
+	--crisp-accent: #7c2d12;
+	--crisp-accent-hover: #64250f;
 	--crisp-on-accent: #fff;
-	--crisp-selected: #fbeee2;
-	--crisp-unread: #fffaf5;
+	--crisp-selected: #f2c9af;
+	/* Informational surfaces stay quiet while selection carries stronger colour. */
+	--crisp-accent-soft: #fbeee2;
+	--crisp-unread: #e7dfd2;
 	--crisp-danger: #b5323e;
 	--crisp-danger-bg: #fbe9ec;
 	--crisp-warning: #805514;
@@ -24,7 +26,7 @@
 	--crisp-code: #9a3412;
 	--crisp-logo-filter: none;
 	--crisp-icon-filter: brightness(0) saturate(100%) invert(34%);
-	--crisp-state-icon-filter: brightness(0) saturate(100%) invert(29%) sepia(83%) saturate(1725%) hue-rotate(355deg) brightness(89%) contrast(96%);
+	--crisp-state-icon-filter: brightness(0) saturate(100%) invert(29%) sepia(83%) saturate(1725%) hue-rotate(355deg) brightness(60%) contrast(96%);
 	--crisp-accent-icon-filter: brightness(0) invert(1);
 	--crisp-overlay: #302a2566;
 	--crisp-translucent: #fffc;

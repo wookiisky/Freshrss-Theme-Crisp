@@ -21,8 +21,24 @@ test('both fixed palettes supply every shared colour role', () => {
 
 for (const [index, colours] of palettes.entries()) {
 	const name = index === 0 ? 'light' : 'dark';
+	// Project regression thresholds for state separation, not WCAG conformance ratios.
+	test(`${name} hover and selection remain visibly separate from adjacent states`, () => {
+		for (const background of ['surface', 'sidebar', 'raised']) {
+			const ratio = contrast(colours.get('--crisp-hover'), colours.get(`--crisp-${background}`));
+			assert.ok(ratio >= 1.6, `hover against ${background}: ${ratio.toFixed(2)}:1`);
+		}
+		const ratio = contrast(colours.get('--crisp-selected'), colours.get('--crisp-hover'));
+		assert.ok(ratio >= 1.15, `selected against hover: ${ratio.toFixed(2)}:1`);
+	});
+
+	// This surface separation is a project regression threshold, not a WCAG requirement.
+	test(`${name} unread articles stand apart from read articles`, () => {
+		const ratio = contrast(colours.get('--crisp-unread'), colours.get('--crisp-surface'));
+		assert.ok(ratio >= 1.3, `unread against read surface: ${ratio.toFixed(2)}:1`);
+	});
+
 	test(`${name} text and links remain readable on reading and interaction surfaces`, () => {
-		for (const background of ['bg', 'surface', 'sidebar', 'raised', 'unread', 'hover', 'selected']) {
+		for (const background of ['bg', 'surface', 'sidebar', 'raised', 'unread', 'hover', 'selected', 'accent-soft']) {
 			for (const foreground of ['text', 'muted', 'accent']) {
 				const ratio = contrast(colours.get(`--crisp-${foreground}`), colours.get(`--crisp-${background}`));
 				assert.ok(ratio >= 4.5, `${foreground} on ${background}: ${ratio.toFixed(2)}:1`);

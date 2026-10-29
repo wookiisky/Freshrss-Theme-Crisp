@@ -6,6 +6,8 @@ Compact, flat themes for FreshRSS, available as **Crisp Light** and **Crisp Dark
 
 ## Screenshots
 
+The screenshots use sample feeds to show the current styles: the first article is selected, the second is hovered, the third and fifth are read, and the remaining articles are unread.
+
 ### Crisp Light
 
 Warm white surfaces, warm grey text and burnt-orange accents. The screenshot uses sample feeds.
@@ -24,9 +26,11 @@ Crisp starts from FreshRSS's bundled Flat design theme and uses surface colours,
 Both editions share component styles and layout, with separate palettes for a consistent reading experience.
 
 - **Compact lists**: less vertical space in feed and article lists, larger text and comfortable article line spacing.
-- **Combined header**: search and reading controls share one toolbar, wrapping on narrow screens or when zoomed in.
+- **Combined header**: search and reading controls share one toolbar, wrapping on narrow screens or when zoomed in. A 2px divider clearly separates the toolbar from the reading area.
 - **Simpler date grouping**: date headings and jump links are hidden when sorting by reception, publication or modification time. Article dates, feed groups and category groups remain available.
-- **Distinct states**: the current article keeps its accent edge even when starred. Stars and read/unread icons retain their meaning, while hover and keyboard focus preserve the current selection.
+- **Clear hover feedback**: the light theme uses a darker warm-grey fill and the dark theme a brighter blue-grey fill on buttons, navigation, menus and article headers.
+- **Selection**: navigation and the current article keep their selection backgrounds and edge markers on hover. Button selection changes only the border colour, preserving the normal text, icons and background; hover, pressing and keyboard focus retain their own feedback.
+- **Reading states**: read and unread articles use different backgrounds with the same font weight. The current article keeps its accent edge even when starred, while stars and read/unread icons retain their meaning. Informational messages retain softer backgrounds.
 - **Recognisable controls**: buttons and inputs have stronger outlines than list dividers. Press feedback is immediate; disabled controls keep any persistent selection without responding to hover. Colour transitions respect reduced-motion preferences.
 - **Fixed palettes**: select the light or dark edition in FreshRSS; neither follows the operating system's colour preference.
 - **RTL support**: generated stylesheets are included for languages written from right to left.

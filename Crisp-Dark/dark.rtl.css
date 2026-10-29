@@ -6,17 +6,19 @@
 	--crisp-surface: #1d272c;
 	--crisp-sidebar: #182125;
 	--crisp-raised: #263238;
-	--crisp-hover: #243238;
+	--crisp-hover: #425b65;
 	--crisp-text: #e6edf0;
-	--crisp-muted: #a6b6be;
+	--crisp-muted: #ccd8de;
 	/* Quiet separators and stronger control outlines serve different roles. */
 	--crisp-border: #303c42;
-	--crisp-control-border: #7b8f98;
-	--crisp-accent: #5ed4bf;
-	--crisp-accent-hover: #8ae3d2;
+	--crisp-control-border: #9caeb6;
+	--crisp-accent: #85e4cf;
+	--crisp-accent-hover: #a2efdf;
 	--crisp-on-accent: #102a25;
-	--crisp-selected: #25453f;
-	--crisp-unread: #202b2e;
+	--crisp-selected: #2a554a;
+	/* Informational surfaces stay quiet while selection carries stronger colour. */
+	--crisp-accent-soft: #25453f;
+	--crisp-unread: #2c4048;
 	--crisp-danger: #ff9da7;
 	--crisp-danger-bg: #432b32;
 	--crisp-warning: #e9c278;

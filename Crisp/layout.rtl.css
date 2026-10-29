@@ -15,7 +15,6 @@ body {
 	display: flex;
 	width: auto;
 	height: auto;
-	border-bottom: 1px solid var(--crisp-border);
 	align-items: center;
 	flex-wrap: wrap;
 	gap: .5rem .75rem;

@@ -186,13 +186,10 @@ input:disabled, select:disabled, textarea:disabled {
 	text-decoration: none;
 }
 
-/* Persistent selection remains distinct when the pointer crosses the control. */
-.btn.active:where(:not(:disabled, .disabled)),
-.dropdown-target:target ~ .btn.dropdown-toggle:where(:not(:disabled, .disabled)) {
-	background: var(--crisp-selected);
-	color: var(--crisp-accent);
+/* Button selection changes only the border; hover and press keep their own feedback. */
+.btn.active:where(:not(:active, :disabled, .disabled)),
+.dropdown-target:target ~ .btn.dropdown-toggle:where(:not(:active, :disabled, .disabled)) {
 	border-color: var(--crisp-accent);
-	text-decoration: none;
 }
 
 /* Press feedback is immediate and stays within the existing control bounds. */
@@ -246,12 +243,11 @@ input:disabled, select:disabled, textarea:disabled {
 /* Unavailable actions may still describe the current view or open menu. */
 .btn.active:is(:disabled, .disabled),
 .dropdown-target:target ~ .btn.dropdown-toggle:is(:disabled, .disabled) {
-	background: var(--crisp-selected);
+	border-color: var(--crisp-accent);
 }
 
 /* Preserve favourite stars and feed identities when tinting state icons. */
-.btn:where(:not(.btn-important, .btn-attention, :disabled, .disabled)):is(:hover, :active, .active) .icon:where(:not([src*="starred"], .favicon)),
-.dropdown-target:target ~ .btn.dropdown-toggle:where(:not(:disabled, .disabled)) .icon:where(:not([src*="starred"], .favicon)),
+.btn:where(:not(.btn-important, .btn-attention, :disabled, .disabled)):is(:hover, :active) .icon:where(:not([src*="starred"], .favicon)),
 .tree-folder.active > .tree-folder-title .icon:where(:not([src*="starred"], .favicon)) {
 	filter: var(--crisp-state-icon-filter);
 }
@@ -291,7 +287,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .header {
-	border-bottom: 1px solid var(--crisp-border);
+	border-bottom: 2px solid var(--crisp-control-border);
 }
 
 .aside {
@@ -311,6 +307,8 @@ input:disabled, select:disabled, textarea:disabled {
 .nav-list .item > a, .nav-list .item .as-link {
 	padding: 0 0.8rem;
 	color: var(--crisp-text);
+	/* Keep the leading selection marker inside the parent's clipping boundary. */
+	box-sizing: border-box;
 }
 
 .nav-list .nav-header {
@@ -334,6 +332,13 @@ input:disabled, select:disabled, textarea:disabled {
 .tree-folder.active > .tree-folder-title {
 	background: var(--crisp-selected);
 	color: var(--crisp-accent);
+}
+
+/* Draw the selection marker once, on the visible row, without moving its text. */
+.nav-list .item.active > a,
+.tree-folder-items > .item.active,
+.tree-folder.active > .tree-folder-title {
+	box-shadow: inset -3px 0 0 var(--crisp-accent);
 }
 
 .tree {
@@ -482,7 +487,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .alert-info, .alert-success, .notification.good {
-	background: var(--crisp-selected);
+	background: var(--crisp-accent-soft);
 	color: var(--crisp-accent);
 	border-color: var(--crisp-accent);
 }
@@ -521,7 +526,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .box.category:not([data-unread="0"]) .box-title {
-	background: var(--crisp-selected);
+	background: var(--crisp-accent-soft);
 }
 
 .box.category .box-title .title {
@@ -554,7 +559,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 #new-article {
-	background: var(--crisp-selected);
+	background: var(--crisp-accent-soft);
 	text-align: center;
 }
 
