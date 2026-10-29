@@ -50,6 +50,27 @@ a:hover, button.as-link:hover {
 	outline-offset: 2px;
 }
 
+/* Keep joined controls above their neighbours without changing their geometry. */
+.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+	position: relative;
+	z-index: 1;
+}
+
+/* These links sit against clipped list or menu edges, so draw focus inside. */
+.flux_header .item-element:focus-visible,
+.aside a:where(:not(.btn)):focus-visible,
+.dropdown-menu a:where(:not(.btn)):focus-visible,
+.dropdown-menu button:where(:not(.btn)):focus-visible {
+	outline-offset: -2px;
+}
+
+/* Edge-aligned buttons need an inset ring contrasting with their own fill. */
+.aside .btn:focus-visible,
+.dropdown-menu .btn:focus-visible {
+	outline-color: currentColor;
+	outline-offset: -3px;
+}
+
 ::selection {
 	background: var(--crisp-selected);
 	color: var(--crisp-text);
@@ -158,8 +179,7 @@ input:disabled, select:disabled, textarea:disabled {
 	vertical-align: middle;
 }
 
-.btn:where(:not(:disabled, .disabled)):hover,
-.btn:where(:not(:disabled, .disabled)):active {
+.btn:where(:not(:disabled, .disabled)):hover {
 	background: var(--crisp-hover);
 	color: var(--crisp-accent);
 	border-color: var(--crisp-accent);
@@ -175,7 +195,16 @@ input:disabled, select:disabled, textarea:disabled {
 	text-decoration: none;
 }
 
-.btn-important {
+/* Press feedback is immediate and stays within the existing control bounds. */
+.btn:where(:not(:disabled, .disabled)):active {
+	background: var(--crisp-selected);
+	color: var(--crisp-accent-hover);
+	border-color: var(--crisp-accent-hover);
+	box-shadow: inset 0 0 0 2px currentColor;
+	transition-duration: 0s;
+}
+
+.btn-important, .btn-important.active {
 	background: var(--crisp-accent);
 	color: var(--crisp-on-accent);
 	border-color: var(--crisp-accent);
@@ -193,18 +222,31 @@ input:disabled, select:disabled, textarea:disabled {
 	filter: var(--crisp-accent-icon-filter);
 }
 
-.btn-attention, .btn-attention:hover, .btn-attention:active {
+.btn-attention, .btn-attention.active,
+.btn-attention:where(:not(:disabled, .disabled)):hover,
+.btn-attention:where(:not(:disabled, .disabled)):active {
 	background: var(--crisp-danger-bg);
 	color: var(--crisp-danger);
 	border-color: var(--crisp-danger);
+}
+
+.btn-attention:where(:not(:disabled, .disabled)):hover:not(:active) {
+	box-shadow: inset 0 0 0 1px currentColor;
 }
 
 .btn:disabled, .btn.disabled {
 	background: var(--crisp-raised);
 	color: var(--crisp-muted);
 	border-color: var(--crisp-control-border);
+	box-shadow: none;
 	cursor: default;
-	opacity: 0.65;
+	opacity: 1;
+}
+
+/* Unavailable actions may still describe the current view or open menu. */
+.btn.active:is(:disabled, .disabled),
+.dropdown-target:target ~ .btn.dropdown-toggle:is(:disabled, .disabled) {
+	background: var(--crisp-selected);
 }
 
 /* Preserve favourite stars and feed identities when tinting state icons. */
@@ -551,7 +593,8 @@ input:disabled, select:disabled, textarea:disabled {
 	border-left-color: var(--crisp-accent);
 }
 
-.flux.favorite {
+/* Only the edge has a priority; the star and unread icon remain independent. */
+.flux.favorite:not(.current) {
 	border-left-color: var(--crisp-warning);
 }
 

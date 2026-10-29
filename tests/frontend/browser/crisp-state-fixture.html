@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<!-- Representative FreshRSS DOM from app/views/helpers/index/normal/entry_header.phtml
+     and app/views/helpers/index/normal.phtml. Local fixture text is test data only. -->
+<html><head><meta charset="utf-8"><base href="http://crisp.test/">
+<style>
+#fixture-controls, #fixture-navigation, #fixture-articles { margin: 24px; }
+#fixture-controls { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; }
+#fixture-navigation { width: 260px; }
+</style></head><body class="normal">
+<section id="fixture-controls">
+  <div class="group">
+    <button id="ordinary" class="btn"><img class="icon" src="themes/icons/read.svg" alt="Read"> Ordinary</button>
+    <button id="selected" class="btn active"><img class="icon" src="themes/icons/read.svg" alt="Read"> Selected</button>
+  </div>
+  <button id="primary" class="btn btn-important">Primary</button>
+  <button id="danger" class="btn btn-attention">Danger</button>
+  <button id="disabled" class="btn" disabled><img class="icon" src="themes/icons/read.svg" alt="Read">Disabled</button>
+  <button id="primary-disabled" class="btn btn-important" disabled>Primary disabled</button>
+  <button id="danger-disabled" class="btn btn-attention" disabled>Danger disabled</button>
+  <button id="selected-disabled" class="btn active" disabled><img class="icon" src="themes/icons/read.svg" alt="Read">Selected disabled</button>
+  <a id="class-disabled" class="btn active disabled" aria-disabled="true" href="#">Disabled link</a>
+  <div class="stick"><input id="search" type="search" aria-label="Search"><button id="search-button" class="btn">Search</button></div>
+  <div class="dropdown">
+    <div id="fixture-menu" class="dropdown-target"></div>
+    <a id="menu-toggle" class="btn dropdown-toggle" href="#fixture-menu">Menu</a>
+    <ul class="dropdown-menu"><li class="item"><a id="menu-action" href="#">Menu action</a></li></ul>
+  </div>
+</section>
+<nav id="fixture-navigation" class="nav-list"><ul><li class="item active"><a id="nav-selected" href="#">Selected navigation</a></li><li class="item"><a href="#">Other navigation</a></li></ul></nav>
+<main id="fixture-articles">
+<article id="article" class="flux current favorite not_read">
+  <ul class="horizontal-list flux_header websiteName has-date">
+    <li class="item manage"><a class="item-element read" href="#"><img class="icon" src="themes/icons/unread.svg" alt="Unread"></a></li>
+    <li class="item manage"><a class="item-element bookmark" href="#"><img class="icon" src="themes/icons/starred.svg" alt="Favorite"></a></li>
+    <li class="item website"><a id="source" class="item-element" href="#"><span class="websiteName">Test source</span></a></li>
+    <li class="item titleAuthorSummaryDate"><a class="item-element title" href="#">An unread favorite at the current reading position</a><span class="item-element date">2026-10-29</span></li>
+  </ul>
+</article>
+</main>
+<section>
+  <nav id="fixture-aside" class="nav aside aside_feed">
+    <div class="stick configure-feeds">
+      <a id="btn-subscription" class="btn btn-important" href="#">Subscriptions</a>
+      <a id="btn-add" class="btn btn-important" href="#"><img class="icon" src="themes/icons/add.svg" alt="Add"></a>
+    </div>
+  </nav>
+</section>
+</body></html>
