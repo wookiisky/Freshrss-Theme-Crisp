@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+/* Fixed dark palette, independent of the operating system preference. */
+:root {
+	--crisp-bg: #151c20;
+	--crisp-surface: #1d272c;
+	--crisp-raised: #263238;
+	--crisp-text: #e6edf0;
+	--crisp-muted: #a6b6be;
+	--crisp-border: #3c4b52;
+	--crisp-accent: #5ed4bf;
+	--crisp-accent-hover: #8ae3d2;
+	--crisp-on-accent: #102a25;
+	--crisp-selected: #25453f;
+	--crisp-unread: #202e30;
+	--crisp-danger: #ff9da7;
+	--crisp-danger-bg: #432b32;
+	--crisp-warning: #e9c278;
+	--crisp-warning-bg: #3a3427;
+	--crisp-code: #e6aed0;
+	--crisp-logo-filter: brightness(1.8) saturate(0.7);
+	--crisp-icon-filter: brightness(0) saturate(100%) invert(78%);
+	--crisp-accent-icon-filter: brightness(0) saturate(100%) invert(12%);
+	--crisp-overlay: #0009;
+	--crisp-translucent: #1d272ccc;
+	color-scheme: dark;
+}

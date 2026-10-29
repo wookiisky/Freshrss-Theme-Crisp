@@ -1,0 +1,8 @@
+{
+	"name": "Crisp Dark",
+	"author": "FreshRSS contributors",
+	"description": "The dark edition of Crisp, with ink-grey surfaces and soft teal accents. Uses the shared Crisp layout.",
+	"version": 1.0,
+	"files": ["_frss.css", "dark.css", "../Crisp/crisp.css", "../Crisp/layout.css", "../Crisp/crisp.js"],
+	"theme-color": "#151c20"
+}

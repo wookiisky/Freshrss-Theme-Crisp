@@ -1,0 +1,27 @@
+@charset "UTF-8";
+
+/* Fixed light palette, independent of the operating system preference. */
+:root {
+	--crisp-bg: #faf8f5;
+	--crisp-surface: #fff;
+	--crisp-raised: #f3ede6;
+	--crisp-text: #302a25;
+	--crisp-muted: #706258;
+	--crisp-border: #e4d9ce;
+	--crisp-accent: #c2410c;
+	--crisp-accent-hover: #9a3412;
+	--crisp-on-accent: #fff;
+	--crisp-selected: #ffedd5;
+	--crisp-unread: #fffaf5;
+	--crisp-danger: #b5323e;
+	--crisp-danger-bg: #fbe9ec;
+	--crisp-warning: #805514;
+	--crisp-warning-bg: #faf0d9;
+	--crisp-code: #9a3412;
+	--crisp-logo-filter: none;
+	--crisp-icon-filter: brightness(0) saturate(100%) invert(34%);
+	--crisp-accent-icon-filter: brightness(0) invert(1);
+	--crisp-overlay: #302a2566;
+	--crisp-translucent: #fffc;
+	color-scheme: light;
+}

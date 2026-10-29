@@ -1,0 +1,244 @@
+@charset "UTF-8";
+
+/* The document remains the scroll container used by FreshRSS navigation and loading. */
+body {
+	display: flex;
+	height: auto;
+	min-height: 100vh;
+	min-height: 100dvh;
+	flex-direction: column;
+}
+
+.header {
+	padding: .5rem .75rem;
+	background: var(--crisp-surface);
+	display: flex;
+	width: auto;
+	height: auto;
+	border-bottom: 1px solid var(--crisp-border);
+	align-items: center;
+	flex-wrap: wrap;
+	gap: .5rem .75rem;
+	position: relative;
+}
+
+.header > .item {
+	padding: 0;
+	display: block;
+	min-width: 0;
+}
+
+.header > .item.title {
+	width: calc(var(--width-aside) - 1.5rem);
+	flex: 0 0 auto;
+	text-align: left;
+}
+
+.header > .item.title a {
+	padding: .25rem .5rem;
+}
+
+.header > .item.title .logo {
+	max-width: 100%;
+	width: auto;
+	height: 1.75rem;
+}
+
+.header > .item.search {
+	margin-left: auto;
+	flex: 1 1 12rem;
+	max-width: 25rem;
+}
+
+.header > .item.search form,
+.header .search .stick {
+	display: flex;
+	width: 100%;
+	min-width: 0;
+}
+
+.header .search input[type="search"] {
+	width: 0;
+	min-width: 0;
+	flex: 1 1 auto;
+}
+
+.header .search .btn {
+	flex: 0 0 auto;
+}
+
+.header > .item.configure {
+	width: auto;
+	flex: 0 0 auto;
+}
+
+.header > .nav_menu {
+	padding: 0;
+	display: flex;
+	max-width: 100%;
+	min-width: 0;
+	align-items: center;
+	flex: 0 1 auto;
+	flex-wrap: wrap;
+	gap: .375rem;
+	position: relative;
+	text-align: left;
+}
+
+.header > .nav_menu > .group,
+.header > .nav_menu > .stick {
+	margin: 0;
+	flex: 0 0 auto;
+}
+
+.header > .nav_menu .btn {
+	margin: 0;
+	white-space: nowrap;
+}
+
+.header > .nav_menu #nav_menu_toggle_aside {
+	position: static;
+}
+
+/* Auto height follows the actual header height, including wrapped controls. */
+#global {
+	display: grid;
+	height: auto;
+	min-width: 0;
+	flex: 1 0 auto;
+	grid-template-columns: auto minmax(0, 1fr);
+	align-content: start;
+}
+
+#global > .aside {
+	grid-column: 1;
+	grid-row: 1 / span 2;
+}
+
+#global > main,
+#global > .nav_menu {
+	min-width: 0;
+	grid-column: 2;
+}
+
+#global > main {
+	max-width: 100%;
+}
+
+.crisp-date-order #stream > .transition {
+	display: none;
+}
+
+#stream.global .box {
+	max-width: calc(100% - 1rem);
+	box-sizing: border-box;
+}
+
+/* Let long content wrap without forcing the page beyond the viewport. */
+.flux_content .content,
+.post {
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
+
+.flux_content pre,
+.post pre {
+	max-width: 100%;
+	overflow: auto;
+}
+
+@media (min-width: 841px) {
+	.header > .nav_menu.nav_mobile {
+		display: none;
+	}
+
+	#global > .aside {
+		max-height: 100vh;
+		max-height: 100dvh;
+		position: sticky;
+		top: 0;
+		align-self: start;
+	}
+
+	#global > .aside:not(.aside_feed) {
+		overflow: auto;
+	}
+
+	#sidebar {
+		max-height: calc(100vh - 5rem);
+		max-height: calc(100dvh - 5rem);
+		overflow-y: auto;
+	}
+}
+
+/* Match the core drawer breakpoint, including browser zoom crossing this width. */
+
+@media (max-width: 840px) {
+	.header {
+		padding: .5rem;
+		gap: .5rem;
+	}
+
+	.crisp-toolbar .header > .item.title {
+		display: none;
+	}
+
+	.header > .item.title {
+		width: auto;
+	}
+
+	.header > .nav_menu {
+		flex-basis: 100%;
+	}
+
+	.header > .nav_menu.nav_mobile {
+		flex-basis: auto;
+	}
+
+	.header > .item.search {
+		margin-left: 0;
+		max-width: none;
+		flex-basis: 8rem;
+	}
+
+	.header > .item.search form {
+		display: flex;
+	}
+
+	/* The real search form is visible, so the duplicate mobile form is unnecessary. */
+	.crisp-toolbar #dropdown-search-wrapper {
+		display: none !important;
+	}
+
+	#global {
+		grid-template-columns: minmax(0, 1fr);
+	}
+
+	#global > main,
+	#global > .nav_menu {
+		grid-column: 1;
+	}
+
+	#sidebar {
+		max-height: calc(100dvh - 8rem);
+		overflow-y: auto;
+	}
+}
+
+@media (pointer: coarse) {
+	.header .btn {
+		min-height: 2.75rem;
+		box-sizing: border-box;
+	}
+}
+
+@media print {
+	body,
+	#global {
+		display: block;
+	}
+
+	.header {
+		display: none;
+	}
+}

@@ -1,0 +1,14 @@
+{
+	"name": "Crisp Light",
+	"author": "FreshRSS contributors",
+	"description": "A compact, flat reading theme with warm neutral surfaces and burnt-orange accents. Inspired by Flat design.",
+	"version": 1.0,
+	"files": [
+		"_frss.css",
+		"light.css",
+		"crisp.css",
+		"layout.css",
+		"crisp.js"
+	],
+	"theme-color": "#faf8f5"
+}
