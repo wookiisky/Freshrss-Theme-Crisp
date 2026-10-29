@@ -19,10 +19,10 @@
 	--frss-dragdrop-color: var(--crisp-selected);
 	--frss-dragdrop-color-transparent: var(--crisp-selected);
 	--frss-noThumbnailImage-background-color: var(--crisp-raised);
-	--frss-darken-background-hover-transparent: var(--crisp-selected);
+	--frss-darken-background-hover-transparent: var(--crisp-hover);
 	--frss-modal-background-color-transparent: var(--crisp-overlay);
 	--frss-box-shadow-color-transparent: transparent;
-	--frss-scrollbar-handle: var(--crisp-border);
+	--frss-scrollbar-handle: var(--crisp-control-border);
 	--frss-scrollbar-handle-hover: var(--crisp-muted);
 	--frss-scrollbar-track: transparent;
 	--frss-scrollbar-track-hover: transparent;
@@ -91,7 +91,7 @@ input, select, textarea {
 	max-width: 100%;
 	color: var(--crisp-text);
 	font-size: 1rem;
-	border: 1px solid var(--crisp-border);
+	border: 1px solid var(--crisp-control-border);
 	border-radius: 0.35rem;
 	box-sizing: border-box;
 	line-height: 1.4;
@@ -148,7 +148,7 @@ input:disabled, select:disabled, textarea:disabled {
 	background: var(--crisp-raised);
 	color: var(--crisp-text);
 	font-size: 0.9375rem;
-	border: 1px solid var(--crisp-border);
+	border: 1px solid var(--crisp-control-border);
 	border-radius: 0.35rem;
 	box-shadow: none;
 	box-sizing: border-box;
@@ -158,9 +158,17 @@ input:disabled, select:disabled, textarea:disabled {
 	vertical-align: middle;
 }
 
-.btn:hover, .btn:active,
-.btn.active,
-.dropdown-target:target ~ .btn.dropdown-toggle {
+.btn:where(:not(:disabled, .disabled)):hover,
+.btn:where(:not(:disabled, .disabled)):active {
+	background: var(--crisp-hover);
+	color: var(--crisp-accent);
+	border-color: var(--crisp-accent);
+	text-decoration: none;
+}
+
+/* Persistent selection remains distinct when the pointer crosses the control. */
+.btn.active:where(:not(:disabled, .disabled)),
+.dropdown-target:target ~ .btn.dropdown-toggle:where(:not(:disabled, .disabled)) {
 	background: var(--crisp-selected);
 	color: var(--crisp-accent);
 	border-color: var(--crisp-accent);
@@ -174,7 +182,8 @@ input:disabled, select:disabled, textarea:disabled {
 	font-weight: 600;
 }
 
-.btn-important:hover, .btn-important:active {
+.btn-important:where(:not(:disabled, .disabled)):hover,
+.btn-important:where(:not(:disabled, .disabled)):active {
 	background: var(--crisp-accent-hover);
 	color: var(--crisp-on-accent);
 	border-color: var(--crisp-accent-hover);
@@ -191,9 +200,22 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .btn:disabled, .btn.disabled {
+	background: var(--crisp-raised);
 	color: var(--crisp-muted);
+	border-color: var(--crisp-control-border);
 	cursor: default;
 	opacity: 0.65;
+}
+
+/* Preserve favourite stars and feed identities when tinting state icons. */
+.btn:where(:not(.btn-important, .btn-attention, :disabled, .disabled)):is(:hover, :active, .active) .icon:where(:not([src*="starred"], .favicon)),
+.dropdown-target:target ~ .btn.dropdown-toggle:where(:not(:disabled, .disabled)) .icon:where(:not([src*="starred"], .favicon)),
+.tree-folder.active > .tree-folder-title .icon:where(:not([src*="starred"], .favicon)) {
+	filter: var(--crisp-state-icon-filter);
+}
+
+.btn:is(:disabled, .disabled) .icon:where(:not([src*="starred"], .favicon)) {
+	filter: var(--crisp-icon-filter);
 }
 
 .stick > input, .stick > .btn,
@@ -231,6 +253,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .aside {
+	background: var(--crisp-sidebar);
 	border-right: 1px solid var(--crisp-border);
 }
 
@@ -255,12 +278,15 @@ input:disabled, select:disabled, textarea:disabled {
 	font-weight: 650;
 }
 
-.nav-list .item a:hover, .nav-list .item .as-link:hover,
-.nav-list .item.active, .tree-folder-items > .item:hover {
-	background: var(--crisp-raised);
+.nav-list .item:where(:not(.active)) a:hover,
+.nav-list .item:where(:not(.active)) .as-link:hover,
+.tree-folder:where(:not(.active)) > .tree-folder-title:hover,
+.tree-folder-items > .item:where(:not(.active)):hover {
+	background: var(--crisp-hover);
 	text-decoration: none;
 }
 
+.nav-list .item.active,
 .nav-list .item.active > a,
 .tree-folder-items > .item.active,
 .tree-folder.active > .tree-folder-title {
@@ -332,6 +358,12 @@ input:disabled, select:disabled, textarea:disabled {
 	font-weight: 400;
 }
 
+.aside.aside_feed .tree-folder.active > .tree-folder-title .title:not([data-unread="0"])::after,
+.aside.aside_feed .tree-folder-items > .item.active .item-title:not([data-unread="0"])::after {
+	background: var(--crisp-surface);
+	color: var(--crisp-accent);
+}
+
 .aside .feed .item-title {
 	padding-top: 0.25rem;
 	padding-bottom: 0.25rem;
@@ -359,7 +391,7 @@ input:disabled, select:disabled, textarea:disabled {
 	font-size: 0.9375rem;
 	border: 1px solid var(--crisp-border);
 	border-radius: 0.4rem;
-	box-shadow: none;
+	box-shadow: var(--crisp-menu-shadow);
 	text-align: left;
 }
 
@@ -387,7 +419,7 @@ input:disabled, select:disabled, textarea:disabled {
 .dropdown-menu .item > a:focus-visible,
 .dropdown-menu .item button:hover:not([disabled]),
 .dropdown-menu .item label:hover:not(.noHover) {
-	background: var(--crisp-selected);
+	background: var(--crisp-hover);
 	color: var(--crisp-accent);
 }
 
@@ -523,7 +555,10 @@ input:disabled, select:disabled, textarea:disabled {
 	border-left-color: var(--crisp-warning);
 }
 
-.flux .flux_header:hover,
+.flux .flux_header:hover {
+	background: var(--crisp-hover);
+}
+
 .flux.current > .flux_header {
 	background: var(--crisp-selected);
 }
@@ -540,6 +575,16 @@ input:disabled, select:disabled, textarea:disabled {
 
 .flux_header .item.title a {
 	color: var(--crisp-text);
+}
+
+/* Source names stay readable without competing with the article title. */
+.flux_header .website a {
+	color: var(--crisp-muted);
+}
+
+.flux_header .website a:hover,
+.flux_header .website a:focus-visible {
+	color: var(--crisp-accent);
 }
 
 .flux:not(.not_read):not(.current) .flux_header .title {
@@ -655,6 +700,16 @@ th {
 footer.main-footer {
 	color: var(--crisp-muted);
 	font-size: 0.875rem;
+}
+
+/* Colour feedback never changes the reading geometry; reduced motion is immediate. */
+
+@media (prefers-reduced-motion: no-preference) {
+	.btn, input, select, textarea,
+	.tree-folder-title, .tree-folder-items > .item,
+	.nav-list .item > a, .dropdown-menu .item > a {
+		transition: background-color 140ms ease-out, color 140ms ease-out, border-color 140ms ease-out;
+	}
 }
 
 @media (max-width: 840px) {

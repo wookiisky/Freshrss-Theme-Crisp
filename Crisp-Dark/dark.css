@@ -4,15 +4,19 @@
 :root {
 	--crisp-bg: #151c20;
 	--crisp-surface: #1d272c;
+	--crisp-sidebar: #182125;
 	--crisp-raised: #263238;
+	--crisp-hover: #243238;
 	--crisp-text: #e6edf0;
 	--crisp-muted: #a6b6be;
-	--crisp-border: #3c4b52;
+	/* Quiet separators and stronger control outlines serve different roles. */
+	--crisp-border: #303c42;
+	--crisp-control-border: #7b8f98;
 	--crisp-accent: #5ed4bf;
 	--crisp-accent-hover: #8ae3d2;
 	--crisp-on-accent: #102a25;
 	--crisp-selected: #25453f;
-	--crisp-unread: #202e30;
+	--crisp-unread: #202b2e;
 	--crisp-danger: #ff9da7;
 	--crisp-danger-bg: #432b32;
 	--crisp-warning: #e9c278;
@@ -20,8 +24,10 @@
 	--crisp-code: #e6aed0;
 	--crisp-logo-filter: brightness(1.8) saturate(0.7);
 	--crisp-icon-filter: brightness(0) saturate(100%) invert(78%);
+	--crisp-state-icon-filter: brightness(0) saturate(100%) invert(79%) sepia(39%) saturate(615%) hue-rotate(112deg) brightness(93%) contrast(89%);
 	--crisp-accent-icon-filter: brightness(0) saturate(100%) invert(12%);
 	--crisp-overlay: #0009;
 	--crisp-translucent: #1d272ccc;
+	--crisp-menu-shadow: 0 8px 24px #0005;
 	color-scheme: dark;
 }
