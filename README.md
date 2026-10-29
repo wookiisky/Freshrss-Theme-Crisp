@@ -51,6 +51,20 @@ cp -R Freshrss-Theme-Crisp/Crisp Freshrss-Theme-Crisp/Crisp-Dark /path/to/FreshR
 Replace `/path/to/FreshRSS` with your installation path. Keep the original directory names and install them side by side.
 The dark edition loads shared CSS and JavaScript from `Crisp`, so both directories must be installed together.
 
+## Packaging
+
+Run from the repository root with Node.js, npm, a POSIX shell and `zip` installed (macOS or Linux):
+
+```sh
+npm run build
+```
+
+The command creates `dist/freshrss-theme-crisp.zip` from the current working tree, including uncommitted changes. The ZIP contains `Crisp/`, `Crisp-Dark/`, both READMEs and the licence at its root. Extract it and copy both theme directories into FreshRSS's `p/themes/` directory.
+
+Packaging includes the existing RTL stylesheets and thumbnails; it does not regenerate CSS. Development files and system metadata are excluded. Each build replaces the previous archive, so removed source files do not remain in the ZIP. No npm dependencies or FreshRSS installation are required for packaging.
+
+Run `npm run test:package` to verify archive contents, rebuilding and failure handling; these tests also require `unzip`.
+
 ## Files and tests
 
 - `Crisp/light.css`: light palette.

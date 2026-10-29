@@ -51,6 +51,20 @@ cp -R Freshrss-Theme-Crisp/Crisp Freshrss-Theme-Crisp/Crisp-Dark /path/to/FreshR
 请将 `/path/to/FreshRSS` 替换为实际安装路径。两个主题目录必须保持原名、位于同一级；
 深色主题会从 `Crisp` 目录加载共享的 CSS 和 JavaScript，因此需要一起安装。
 
+## 打包
+
+在仓库根目录运行，需要已安装 Node.js、npm、POSIX shell 和 `zip`（macOS 或 Linux）：
+
+```sh
+npm run build
+```
+
+命令从当前工作区生成 `dist/freshrss-theme-crisp.zip`，包含尚未提交的修改。压缩包根目录包含 `Crisp/`、`Crisp-Dark/`、中英文 README 和许可证。解压后，将两个主题目录一起复制到 FreshRSS 的 `p/themes/` 目录。
+
+打包包含现有 RTL 样式和缩略图，不重新生成 CSS；开发文件和系统杂文件不会进入压缩包。每次构建都会重新生成并替换旧包，因此已删除的源文件不会残留。打包无需安装 npm 依赖或 FreshRSS。
+
+运行 `npm run test:package` 可检查压缩包内容、重复打包和失败处理；这些测试还需要 `unzip`。
+
 ## 文件与测试
 
 - `Crisp/light.css`：浅色配色。

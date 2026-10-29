@@ -3,7 +3,9 @@
   "private": true,
   "type": "module",
   "scripts": {
+    "build": "sh scripts/package-theme.sh",
     "test": "node --test tests/frontend/*.test.mjs",
+    "test:package": "node --test tests/build/*.test.mjs",
     "test:browser": "node --test tests/frontend/browser/crisp-states.test.mjs"
   },
   "devDependencies": {
