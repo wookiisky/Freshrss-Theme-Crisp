@@ -19,8 +19,8 @@ before(async () => {
 after(async () => { await browser?.close(); });
 
 // Load the same upstream CSS and theme order as FreshRSS, with local icons and no application requests.
-async function openFixture(theme, direction) {
-	const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce' });
+async function openFixture(theme, direction, hasTouch = false) {
+	const page = await browser.newPage({ viewport: { width: 1440, height: 900 }, reducedMotion: 'reduce', hasTouch });
 	page.setDefaultTimeout(5000);
 	await page.route('**/*', async route => {
 		const url = new URL(route.request().url());
@@ -89,6 +89,144 @@ async function colour(page, role) {
 
 for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 	const label = `${theme}/${direction}`;
+
+	test(`${label}: paused subscriptions are hidden only in the reading sidebar`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			await page.evaluate(() => document.querySelector('#fixture-aside').append(document.querySelector('#fixture-tree')));
+			for (const width of [1440, 390]) {
+				await page.setViewportSize({ width, height: 900 });
+				for (const classes of ['mute', 'mute error', 'mute error active']) {
+					await page.locator('#feed-ordinary').evaluate((row, value) => { row.className = `item feed ${value}`; }, classes);
+					assert.equal(await page.locator('#feed-ordinary').boundingBox(), null, `${classes} has no visible row at ${width}px`);
+					assert.equal(await page.locator('#feed-ordinary > a').count(), 1, 'subscription remains in the DOM');
+				}
+			}
+			await page.locator('#feed-ordinary').evaluate(row => row.classList.remove('mute'));
+			assert.ok(await page.locator('#feed-ordinary').isVisible(), 'resuming restores the subscription');
+			await page.locator('#feed-ordinary').evaluate(row => row.classList.add('mute'));
+			await page.evaluate(() => {
+				const management = document.createElement('div');
+				management.className = 'box';
+				management.innerHTML = '<ul class="box-content"></ul>';
+				document.body.append(management);
+				management.firstElementChild.append(document.querySelector('#feed-ordinary'));
+			});
+			assert.ok(await page.locator('#feed-ordinary').isVisible(), 'management still shows paused subscriptions');
+			assert.match(await page.locator('#feed-ordinary .item-title').evaluate(element => getComputedStyle(element, '::before').content), /🔇/);
+		} finally { await page.close(); }
+	});
+
+	test(`${label}: sidebar errors keep ordinary feed states without warning icons`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			await page.evaluate(() => {
+				document.querySelector('#fixture-aside').append(document.querySelector('#fixture-tree'));
+				const link = document.querySelector('#feed-selected .item-title');
+				link.title = 'Feed update failed';
+				link.insertAdjacentHTML('afterbegin', '<img class="favicon" src="themes/icons/favicon.svg" alt="">');
+			});
+			for (const active of [false, true]) {
+				await page.locator('#feed-selected').evaluate((row, value) => { row.className = `item feed${value ? ' active' : ''}`; }, active);
+				await page.mouse.move(0, 0);
+				const rowStyle = await appearance(page, '#feed-selected');
+				const linkStyle = await appearance(page, '#feed-selected > a');
+				await page.locator('#feed-selected').hover();
+				const hoverStyle = await appearance(page, '#feed-selected');
+				for (const classes of ['error', 'error empty']) {
+					await page.locator('#feed-selected').evaluate((row, value) => { row.className = `item feed ${value.classes}${value.active ? ' active' : ''}`; }, { classes, active });
+					await page.mouse.move(0, 0);
+					assert.deepEqual(await appearance(page, '#feed-selected'), rowStyle);
+					assert.deepEqual(await appearance(page, '#feed-selected > a'), linkStyle);
+					assert.equal(await page.locator('#feed-selected .title').evaluate(element => getComputedStyle(element, '::before').content), 'none');
+					await page.locator('#feed-selected').hover();
+					assert.deepEqual(await appearance(page, '#feed-selected'), hoverStyle);
+				}
+			}
+			assert.ok(await page.locator('#feed-selected .favicon').isVisible());
+			assert.equal(await page.locator('#feed-selected > a').getAttribute('title'), 'Feed update failed');
+			assert.equal(await page.locator('#feed-selected > a').evaluate(element => getComputedStyle(element, '::after').content), '"3"');
+			await page.locator('#folder-title .title').evaluate(element => element.classList.add('error'));
+			assert.equal(await page.locator('#folder-title .title').evaluate(element => getComputedStyle(element, '::before').content), 'none');
+			assert.ok(await page.locator('#folder-title button .icon').isVisible(), 'category expand control remains');
+			await page.locator('#fixture-tree .tree-folder-items').evaluate(element => element.classList.remove('active'));
+			assert.equal(await page.locator('#fixture-tree .tree-folder-items').evaluate(element => getComputedStyle(element).maxHeight), '0px');
+			await page.locator('#feed-ordinary').evaluate(row => row.classList.add('empty'));
+			assert.equal((await appearance(page, '#feed-ordinary > a')).color, await colour(page, 'warning'), 'empty-only state is preserved');
+			await page.evaluate(() => document.body.append(document.querySelector('#fixture-tree')));
+			assert.equal((await appearance(page, '#feed-selected > a')).color, await colour(page, 'danger'), 'errors outside the sidebar keep their styling');
+			assert.match(await page.locator('#feed-selected .title').evaluate(element => getComputedStyle(element, '::before').content), /⚠/);
+			assert.match(await page.locator('#folder-title .title').evaluate(element => getComputedStyle(element, '::before').content), /⚠/);
+		} finally { await page.close(); }
+	});
+
+	test(`${label}: desktop lists stay compact with feed menus and visible article separators`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			// Include the real sidebar ancestors, menu control and favicon that can set a feed row's height.
+			await page.evaluate(() => {
+				document.querySelector('#fixture-aside').append(document.querySelector('#fixture-tree'));
+				for (const row of document.querySelectorAll('#fixture-tree .feed')) {
+					row.insertAdjacentHTML('afterbegin', '<div class="dropdown"><a class="dropdown-toggle" href="#"><img class="icon" src="themes/icons/configure.svg" alt="Configure"></a></div>');
+					row.querySelector('.item-title').insertAdjacentHTML('afterbegin', '<img class="favicon" src="themes/icons/favicon.svg" alt="">');
+				}
+			});
+			for (const width of [1440, 768, 390]) {
+				await page.setViewportSize({ width, height: 900 });
+				for (const [selector, maximum] of [['#feed-selected', 24], ['#feed-ordinary', 24], ['#folder-title', 28], ['#article', 29]]) {
+					const { height } = await page.locator(selector).boundingBox();
+					assert.ok(height <= maximum + 0.1, `${selector} at ${width}px is ${height}px; expected at most ${maximum}px`);
+				}
+			}
+			const counterFits = await page.locator('#feed-selected > .item-title').evaluate(element => {
+				const style = getComputedStyle(element, '::after');
+				return parseFloat(style.lineHeight) + parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) <= element.getBoundingClientRect().height;
+			});
+			assert.ok(counterFits, 'unread counter fits inside the compact feed row');
+			const divider = await page.locator('#article').evaluate(element => {
+				const style = getComputedStyle(element);
+				return { width: style.borderBottomWidth, style: style.borderBottomStyle, colour: style.borderBottomColor };
+			});
+			assert.equal(divider.width, '1px');
+			assert.equal(divider.style, 'solid');
+			assert.equal(divider.colour, await colour(page, 'list-divider'));
+			await page.locator('#article').evaluate(element => element.classList.remove('current', 'favorite'));
+			for (const unread of [true, false]) {
+				await page.locator('#article').evaluate((element, value) => element.classList.toggle('not_read', value), unread);
+				const background = await renderedBackground(page, '#article');
+				const quiet = await colour(page, 'border');
+				assert.ok(contrast(divider.colour, background) > contrast(quiet, background), 'article divider is clearer than the ordinary surface border');
+			}
+			// Rich headers must grow with their content instead of clipping to the compact single-line height.
+			await page.locator('#article .flux_header').evaluate(element => {
+				element.classList.add('has-summary');
+				element.querySelector('.titleAuthorSummaryDate').insertAdjacentHTML('beforeend', '<div class="summary">A short article summary.</div>');
+			});
+			const summary = await page.locator('#article .summary').boundingBox();
+			const article = await page.locator('#article').boundingBox();
+			assert.ok(article.height > 29);
+			assert.ok(summary.y + summary.height <= article.y + article.height);
+			await page.locator('#article .flux_header').evaluate(element => {
+				element.classList.add('has-thumbnail');
+				element.insertAdjacentHTML('afterbegin', '<li class="item thumbnail square"><img class="item-element" src="themes/icons/favicon.svg" alt=""></li>');
+			});
+			const thumbnail = await page.locator('#article .thumbnail').boundingBox();
+			const expanded = await page.locator('#article').boundingBox();
+			assert.ok(thumbnail.height >= 80);
+			assert.ok(thumbnail.y + thumbnail.height <= expanded.y + expanded.height);
+		} finally { await page.close(); }
+	});
+
+	test(`${label}: touch input keeps the existing sidebar and article spacing`, async () => {
+		const page = await openFixture(theme, direction, true);
+		try {
+			await page.evaluate(() => document.querySelector('#fixture-aside').append(document.querySelector('#fixture-tree')));
+			assert.equal(await page.evaluate(() => matchMedia('(pointer: coarse)').matches), true);
+			assert.equal((await page.locator('#folder-title').boundingBox()).height, 44);
+			assert.equal((await page.locator('#feed-selected').boundingBox()).height, 30.5);
+			assert.equal((await page.locator('#article').boundingBox()).height, 45);
+		} finally { await page.close(); }
+	});
 
 	test(`${label}: read and unread remain distinct and the header has a clear divider`, async () => {
 		const page = await openFixture(theme, direction);

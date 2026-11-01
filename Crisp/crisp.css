@@ -296,7 +296,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .nav-list {
-	font-size: 0.9375rem;
+	font-size: 0.875rem;
 }
 
 .nav-list .item, .nav-list .item.nav-header {
@@ -352,7 +352,7 @@ input:disabled, select:disabled, textarea:disabled {
 	align-items: center;
 	position: relative;
 	color: var(--crisp-text);
-	font-size: 1.0625rem;
+	font-size: 1rem;
 	line-height: 2rem;
 	font-weight: 400;
 }
@@ -366,8 +366,8 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .tree-folder-items > .item {
-	font-size: 1.0625rem;
-	/* Keep the original row height as the text grows. */
+	font-size: 1rem;
+	/* Keep row height independent of the text size. */
 	line-height: 1.40625rem;
 }
 
@@ -430,6 +430,29 @@ input:disabled, select:disabled, textarea:disabled {
 
 .feed.item.error, .feed.item.error > a {
 	color: var(--crisp-danger);
+}
+
+/* Keep paused subscriptions out of the reading tree, while management retains their state. */
+.aside.aside_feed .tree-folder-items > .feed.mute {
+	display: none;
+}
+
+/* Sidebar errors use ordinary navigation states; their details remain in the link tooltip. */
+.aside.aside_feed .feed.item.error {
+	color: var(--crisp-text);
+}
+
+.aside.aside_feed .feed.item.error.active {
+	color: var(--crisp-accent);
+}
+
+.aside.aside_feed .feed.item.error > a {
+	color: inherit;
+}
+
+.aside.aside_feed .tree-folder-title .title.error::before,
+.aside.aside_feed .feed.error .item-title .title::before {
+	content: none;
 }
 
 .dropdown-menu {
@@ -584,7 +607,7 @@ input:disabled, select:disabled, textarea:disabled {
 /* A consistent edge identifies the current article without shifting its text. */
 .flux {
 	background: var(--crisp-surface);
-	border-bottom: 1px solid var(--crisp-border);
+	border-bottom: 1px solid var(--crisp-list-divider);
 	border-left: 3px solid transparent;
 }
 
@@ -773,6 +796,34 @@ footer.main-footer {
 	.dropdown-target:target ~ .dropdown-toggle::after {
 		background: var(--crisp-surface);
 		border-color: var(--crisp-border);
+	}
+}
+
+/* Compact mouse-driven lists without reducing touch targets or constraining rich headers. */
+@media (pointer: fine) {
+	.tree-folder-title {
+		min-height: 1.75rem;
+		line-height: 1.75rem;
+	}
+
+	.tree-folder-items > .item {
+		line-height: 1.25rem;
+	}
+
+	.aside .feed .item-title,
+	.aside_feed .tree-folder-items .dropdown .dropdown-toggle {
+		padding-top: 0.125rem;
+		padding-bottom: 0.125rem;
+	}
+
+	/* Keep unread counters inside the shorter rows. */
+	.aside.aside_feed .category .title:not([data-unread="0"])::after,
+	.aside.aside_feed .feed .item-title:not([data-unread="0"])::after {
+		line-height: 1rem;
+	}
+
+	.flux_header {
+		--frss-padding-top-bottom: 0.125rem;
 	}
 }
 

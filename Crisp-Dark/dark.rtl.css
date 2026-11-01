@@ -11,6 +11,7 @@
 	--crisp-muted: #ccd8de;
 	/* Quiet separators and stronger control outlines serve different roles. */
 	--crisp-border: #303c42;
+	--crisp-list-divider: #45565e;
 	--crisp-control-border: #9caeb6;
 	--crisp-accent: #85e4cf;
 	--crisp-accent-hover: #a2efdf;

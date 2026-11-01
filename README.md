@@ -26,6 +26,7 @@ Crisp starts from FreshRSS's bundled Flat design theme and uses surface colours,
 Both editions share component styles and layout, with separate palettes for a consistent reading experience.
 
 - **Compact lists**: less vertical space in feed and article lists, larger text and comfortable article line spacing.
+- **Simpler subscription sidebar**: paused subscriptions are hidden, and feed errors use ordinary text without warning icons on feeds or categories. Error details remain in feed tooltips, and paused subscriptions remain available in management.
 - **Combined header**: search and reading controls share one toolbar, wrapping on narrow screens or when zoomed in. A 2px divider clearly separates the toolbar from the reading area.
 - **Simpler date grouping**: date headings and jump links are hidden when sorting by reception, publication or modification time. Article dates, feed groups and category groups remain available.
 - **Clear hover feedback**: the light theme uses a darker warm-grey fill and the dark theme a brighter blue-grey fill on buttons, navigation, menus and article headers.
