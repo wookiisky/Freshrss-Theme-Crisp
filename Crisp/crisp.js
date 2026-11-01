@@ -69,7 +69,12 @@
 
 			if (blank && blankBlocks.has(node.tagName)) marks.push([node, 'crisp-empty']);
 			if (['block', 'flow-root'].includes(style.display) && !node.querySelector(layoutElements)) {
-				if (node.tagName === 'P') marks.push([node, 'crisp-paragraph']);
+				if (node.tagName === 'P') {
+					// A paragraph must not change the line height inherited by protected text inside it.
+					const preservesText = [...node.querySelectorAll('*')].some(child =>
+						child.matches('pre, code, kbd, samp') || preservedWhitespace.has(getComputedStyle(child).whiteSpace));
+					if (!preservesText) marks.push([node, 'crisp-paragraph']);
+				}
 				else if (heading) marks.push([node, 'crisp-heading']);
 			}
 			return blank;

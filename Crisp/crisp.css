@@ -748,7 +748,8 @@ input:disabled, select:disabled, textarea:disabled {
 
 /* Only ordinary article text receives these marks; preserve source layouts elsewhere. */
 .flux_content .content .text .crisp-paragraph {
-	margin-block: 0.8em !important;
+	margin-block: 0.54em !important;
+	line-height: 1.395 !important;
 }
 
 .flux_content .content .text .crisp-heading {

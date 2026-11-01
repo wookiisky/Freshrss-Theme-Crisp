@@ -60,6 +60,7 @@ async function protectedContent(page) {
 			display: style.display,
 			whiteSpace: style.whiteSpace,
 			margin: style.margin,
+			lineHeight: style.lineHeight,
 			padding: style.padding,
 			height: element.getBoundingClientRect().height,
 		};
@@ -73,9 +74,14 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 			await page.addScriptTag({ content: script });
 			for (const selector of ['[data-case="paragraph-first"]', '[data-case="paragraph-second"]']) {
 				const spacing = await blockSpacing(page, selector);
-				assert.ok(Math.abs(spacing.before - spacing.font * 0.8) < 0.1, `${selector} has 0.8em before`);
-				assert.ok(Math.abs(spacing.after - spacing.font * 0.8) < 0.1, `${selector} has 0.8em after`);
+				assert.ok(Math.abs(spacing.before - spacing.font * 0.54) < 0.1, `${selector} has 0.54em before`);
+				assert.ok(Math.abs(spacing.after - spacing.font * 0.54) < 0.1, `${selector} has 0.54em after`);
 			}
+			const lineHeight = await page.locator('[data-case="paragraph-first"]').evaluate(element => {
+				const style = getComputedStyle(element);
+				return parseFloat(style.lineHeight) / parseFloat(style.fontSize);
+			});
+			assert.ok(Math.abs(lineHeight - 1.395) < 0.001, 'ordinary paragraphs use compact line height');
 			const heading = await blockSpacing(page, '[data-case="heading"]');
 			assert.ok(Math.abs(heading.before - heading.font * 1.4) < 0.1);
 			assert.ok(Math.abs(heading.after - heading.font * 0.6) < 0.1);
@@ -112,7 +118,7 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 				const second = document.querySelector('[data-case="paragraph-second"]');
 				return { pixels: second.getBoundingClientRect().top - first.getBoundingClientRect().bottom, font: parseFloat(getComputedStyle(first).fontSize) };
 			});
-			assert.ok(Math.abs(gap.pixels - gap.font * 0.8) < 0.2, 'empty blocks do not add to the normal paragraph gap');
+			assert.ok(Math.abs(gap.pixels - gap.font * 0.54) < 0.2, 'empty blocks do not add to the normal paragraph gap');
 			const once = await page.locator('.flux_content .text').innerHTML();
 			await page.locator('.flux').evaluate(article => article.dispatchEvent(new Event('freshrss:openArticle', { bubbles: true })));
 			await page.evaluate(() => document.body.dispatchEvent(new Event('freshrss:load-more', { bubbles: true })));
@@ -123,10 +129,24 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 	test(`${theme}/${direction}: code, preformatted text, media, anchors and decorations retain their layout`, async () => {
 		const page = await openArticle(theme, direction);
 		try {
+			for (const name of ['inline-code', 'table', 'pre-wrap', 'nested-pre-wrap']) {
+				const ratio = await page.locator(`[data-protected="${name}"]`).evaluate(element => {
+					const style = getComputedStyle(element);
+					return parseFloat(style.lineHeight) / parseFloat(style.fontSize);
+				});
+				assert.ok(Math.abs(ratio - 1.7) < 0.001, `${name} retains the original line height`);
+			}
 			const before = await protectedContent(page);
 			const outside = await page.locator('[data-case="outside-article"]').evaluate(element => ({ html: element.outerHTML, height: element.getBoundingClientRect().height }));
 			await page.addScriptTag({ content: script });
 			assert.deepEqual(await protectedContent(page), before);
+			for (const selector of ['[data-case="code-wrapper"]', '[data-case="nested-pre-wrapper"]']) {
+				const ratio = await page.locator(selector).evaluate(element => {
+					const style = getComputedStyle(element);
+					return parseFloat(style.lineHeight) / parseFloat(style.fontSize);
+				});
+				assert.ok(Math.abs(ratio - 1.7) < 0.001, 'paragraphs containing protected text retain their line height');
+			}
 			assert.deepEqual(await page.locator('[data-case="outside-article"]').evaluate(element => ({ html: element.outerHTML, height: element.getBoundingClientRect().height })), outside);
 			assert.ok(await page.locator('[data-protected="image-wrapper"]').isVisible(), 'lazy image wrapper stays visible before a source is available');
 			await page.locator('[data-case="lazy-image"]').scrollIntoViewIfNeeded();
@@ -155,7 +175,7 @@ test('article processing supports early scripts, opening replaced content and lo
 		assert.equal(await visibleBreaks(page, '[data-case="replacement"]'), 2);
 		assert.equal(await page.locator('[data-case="replacement-empty"]').isVisible(), false);
 		const replacement = await blockSpacing(page, '[data-case="replacement"]');
-		assert.ok(Math.abs(replacement.before - replacement.font * 0.8) < 0.1);
+		assert.ok(Math.abs(replacement.before - replacement.font * 0.54) < 0.1);
 		await page.locator('#stream').evaluate(stream => stream.insertAdjacentHTML('beforeend', '<article class="flux"><div class="flux_content"><div class="content"><div class="text"><p data-case="appended">Appended<br><br><br><br>content</p><div data-case="appended-empty"><p><br></p></div></div></div></div></article>'));
 		await page.evaluate(() => document.body.dispatchEvent(new Event('freshrss:load-more', { bubbles: true })));
 		assert.equal(await visibleBreaks(page, '[data-case="appended"]'), 2);
@@ -174,7 +194,7 @@ test('decorated article roots and nonempty anchor paragraphs still normalise the
 		await page.addScriptTag({ content: script });
 		assert.equal(await page.locator('[data-case="blank-nbsp"]').isVisible(), false, 'decorated root does not protect its entire article from processing');
 		const ordinary = await blockSpacing(page, '[data-case="paragraph-first"]');
-		assert.ok(Math.abs(ordinary.before - ordinary.font * 0.8) < 0.1);
+		assert.ok(Math.abs(ordinary.before - ordinary.font * 0.54) < 0.1);
 		assert.equal(await page.locator('#fixture-article-body').evaluate(body => body.style.backgroundColor), 'rgb(241, 242, 243)', 'root decoration remains intact');
 		assert.equal(await visibleBreaks(page, '[data-case="anchored-paragraph"]'), 2, 'nonempty paragraph anchors do not disable excess-break compression');
 		assert.equal(await page.locator('#fixture-text-anchor').count(), 1, 'text anchor remains addressable');
@@ -198,7 +218,7 @@ test('article spacing remains readable on a narrow viewport and with zoomed text
 			assert.ok(result.scrollHeight <= result.clientHeight + 1, 'text is not vertically clipped');
 			assert.equal(await visibleBreaks(page, '[data-case="many-breaks"]'), 2);
 			const spacing = await blockSpacing(page, '[data-case="paragraph-first"]');
-			assert.ok(Math.abs(spacing.before - spacing.font * 0.8) < 0.1);
+			assert.ok(Math.abs(spacing.before - spacing.font * 0.54) < 0.1);
 		}
 	} finally { await page.close(); }
 });
