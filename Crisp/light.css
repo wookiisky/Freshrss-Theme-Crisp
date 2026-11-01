@@ -2,33 +2,48 @@
 
 /* Fixed light palette, independent of the operating system preference. */
 :root {
-	--crisp-bg: #faf8f5;
-	--crisp-surface: #fff;
-	--crisp-sidebar: #f6f4f0;
-	--crisp-raised: #f2efea;
-	--crisp-hover: #c6b9a9;
+	--crisp-bg: #efebe4;
+	--crisp-surface: #f4f1eb;
+	--crisp-sidebar: #f1ede6;
+	--crisp-raised: #eee9e1;
+	--crisp-hover: #bfae96;
 	--crisp-text: #302a25;
-	--crisp-muted: #514338;
+	--crisp-muted: #4d4035;
 	/* Quiet separators and stronger control outlines serve different roles. */
 	--crisp-border: #e9e4dd;
-	--crisp-list-divider: #d5cdc2;
-	--crisp-control-border: #6f6256;
-	--crisp-accent: #7c2d12;
-	--crisp-accent-hover: #64250f;
-	--crisp-on-accent: #fff;
-	--crisp-selected: #f2c9af;
+	--crisp-list-divider: #c9bfb1;
+	--crisp-control-border: #665a4d;
+	--crisp-accent: #733000;
+	--crisp-accent-hover: #592500;
+	/* Bright action fills and reading links have different contrast needs. */
+	--crisp-primary: #f28a00;
+	--crisp-primary-hover: #ff9b18;
+	--crisp-on-accent: #302a25;
+	--crisp-link: #b04a00;
+	--crisp-link-hover: #963c00;
+	--crisp-selected: #ffad33;
 	/* Informational surfaces stay quiet while selection carries stronger colour. */
-	--crisp-accent-soft: #fbeee2;
-	--crisp-unread: #e7dfd2;
+	--crisp-accent-soft: #faedda;
+	--crisp-unread: #ddd4c6;
 	--crisp-danger: #b5323e;
 	--crisp-danger-bg: #fbe9ec;
 	--crisp-warning: #805514;
 	--crisp-warning-bg: #faf0d9;
 	--crisp-code: #9a3412;
+	/* Article hierarchy uses its own palette, independent of interface actions. */
+	--crisp-heading-1: #803b0b;
+	--crisp-heading-2: #21665d;
+	--crisp-heading-3: #355e86;
+	--crisp-heading-4: #425e72;
+	--crisp-heading-5: #485d68;
+	--crisp-heading-6: #535c63;
+	--crisp-strong: #7b5214;
+	--crisp-highlight-bg: #eee5c9;
+	--crisp-highlight-text: #604c25;
 	--crisp-logo-filter: none;
 	--crisp-icon-filter: brightness(0) saturate(100%) invert(34%);
-	--crisp-state-icon-filter: brightness(0) saturate(100%) invert(29%) sepia(83%) saturate(1725%) hue-rotate(355deg) brightness(60%) contrast(96%);
-	--crisp-accent-icon-filter: brightness(0) invert(1);
+	--crisp-state-icon-filter: brightness(0) saturate(100%) invert(29%) sepia(100%) saturate(900%) hue-rotate(358deg) brightness(65%);
+	--crisp-accent-icon-filter: brightness(0) saturate(100%) invert(17%);
 	--crisp-overlay: #302a2566;
 	--crisp-translucent: #fffc;
 	--crisp-menu-shadow: 0 6px 20px #302a251a;

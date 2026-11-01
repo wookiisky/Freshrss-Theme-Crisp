@@ -17,6 +17,7 @@ export function createCrispDocument({ toolbar = true, search = true, readyState 
 	};
 	const document = {
 		readyState,
+		querySelectorAll: () => [],
 		documentElement: {
 			classList: {
 				add: name => classes.add(name),

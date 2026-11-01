@@ -26,6 +26,8 @@ Crisp starts from FreshRSS's bundled Flat design theme and uses surface colours,
 Both editions share component styles and layout, with separate palettes for a consistent reading experience.
 
 - **Compact lists**: less vertical space in feed and article lists, larger text and comfortable article line spacing.
+- **Article colour hierarchy**: light articles use warm brown, teal and blue-grey headings with golden-brown bold text; dark articles use soft coral, pale teal and misty blue headings with pale-gold bold text. H1–H6 have separate colours, with lower levels converging towards blue-grey while retaining their existing size, weight and spacing. Highlights use a pale-wheat background with dark-brown text in light mode, and a dark olive-gold background with pale-beige text in dark mode. Italics keep their surrounding colour; bold text inside headings, links, code and highlights keeps its context colour. Source inline colours remain intact.
+- **Article spacing**: ordinary paragraphs use `0.8em` above and below; article headings use `1.4em` above and `0.6em` below. Empty paragraphs and simple containers containing only whitespace, `&nbsp;` or breaks are hidden. Single and double breaks remain intact; runs of three or more breaks become two, leaving at most one blank line.
 - **Simpler subscription sidebar**: paused subscriptions are hidden, and feed errors use ordinary text without warning icons on feeds or categories. Error details remain in feed tooltips, and paused subscriptions remain available in management.
 - **Combined header**: search and reading controls share one toolbar, wrapping on narrow screens or when zoomed in. A 2px divider clearly separates the toolbar from the reading area.
 - **Simpler date grouping**: date headings and jump links are hidden when sorting by reception, publication or modification time. Article dates, feed groups and category groups remain available.
@@ -35,6 +37,11 @@ Both editions share component styles and layout, with separate palettes for a co
 - **Recognisable controls**: buttons and inputs have stronger outlines than list dividers. Press feedback is immediate; disabled controls keep any persistent selection without responding to hover. Colour transitions respect reduced-motion preferences.
 - **Fixed palettes**: select the light or dark edition in FreshRSS; neither follows the operating system's colour preference.
 - **RTL support**: generated stylesheets are included for languages written from right to left.
+
+Article cleanup only affects content displayed on FreshRSS web pages; it does not rewrite the database or feeds, or change third-party clients.
+Code, tables, media, empty anchors, visible decorations and regions using `white-space` to preserve whitespace keep their layout. Complex container margins, padding and heights are not reset globally.
+Intentional runs of multiple blank lines in ordinary HTML are also compressed; content requiring exact whitespace should use a preformatted region.
+Cleanup runs on initial load, article opening and loading more articles, supports replaced content, and retains original nodes and event handlers.
 
 ## Installation
 
@@ -71,7 +78,7 @@ Run `npm run test:package` to verify archive contents, rebuilding and failure ha
 - `Crisp/light.css`: light palette.
 - `Crisp-Dark/dark.css`: dark palette.
 - `Crisp/crisp.css` and `Crisp/layout.css`: shared component styles and responsive layout.
-- `Crisp/crisp.js`: moves the existing toolbar and identifies date sorting while preserving controls and event handlers.
+- `Crisp/crisp.js`: moves the existing toolbar, identifies date sorting and normalises article spacing while preserving controls, article nodes and event handlers.
 - `*.rtl.css`: generated RTL stylesheets; regenerate these from their corresponding CSS files when maintaining the styles.
 
 Run the interaction and palette tests from the repository root using Node.js:
@@ -87,7 +94,7 @@ npm ci
 FRESHRSS_ROOT=/path/to/FreshRSS npm run test:browser
 ```
 
-These tests load FreshRSS's actual base CSS and icons with representative component markup, checking light/dark palettes and LTR/RTL states. They cover selection, unread/favourite combinations, disabled controls, pressing, keyboard focus and reduced motion. Missing FreshRSS files or Chrome cause a failure rather than a skipped check. `CRISP_BROWSER_CHANNEL` can select another installed Playwright browser channel. The development dependencies are not needed to install or use the themes.
+These tests load FreshRSS's actual base CSS and icons with representative component markup, checking light/dark palettes and LTR/RTL states. They cover selection, unread/favourite combinations, disabled controls, pressing, keyboard focus and reduced motion, as well as article spacing, blank-line compression, code and media preservation, dynamic loading, narrow screens and text zoom. Missing FreshRSS files or Chrome cause a failure rather than a skipped check. `CRISP_BROWSER_CHANNEL` can select another installed Playwright browser channel. The development dependencies are not needed to install or use the themes.
 
 ## Credits and licence
 

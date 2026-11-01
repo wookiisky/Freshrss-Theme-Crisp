@@ -400,7 +400,7 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 			const pressed = await appearance(page, '#ordinary');
 			assert.notEqual(pressed.backgroundColor, hover.backgroundColor);
 			await page.mouse.up();
-			for (const [selector, foreground, background] of [['#primary', 'on-accent', 'accent-hover'], ['#danger', 'danger', 'danger-bg']]) {
+			for (const [selector, foreground, background] of [['#primary', 'on-accent', 'primary-hover'], ['#danger', 'danger', 'danger-bg']]) {
 				await page.locator(selector).hover();
 				const beforePress = await appearance(page, selector);
 				await page.mouse.down();
@@ -453,6 +453,7 @@ for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 	test(`${label}: rendered text, control edges and focus have sufficient contrast`, async () => {
 		const page = await openFixture(theme, direction);
 		try {
+			assert.equal((await appearance(page, '#primary')).backgroundColor, await colour(page, 'primary'));
 			for (const selector of ['#ordinary', '#selected', '#primary', '#danger', '#selected-disabled', '#source', '#nav-selected', '#folder-title', '#feed-selected > a']) {
 				const style = await appearance(page, selector);
 				const background = await renderedBackground(page, selector);

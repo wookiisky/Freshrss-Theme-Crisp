@@ -9,7 +9,7 @@ const source = readFileSync(new URL('../../Crisp/crisp.js', import.meta.url), 'u
 // Execute the browser entry point against the control identity boundary.
 function start(options = {}, context = { sort: 'id' }) {
 	const dom = createCrispDocument(options);
-	const sandbox = vm.createContext({ document: dom.document, context });
+	const sandbox = vm.createContext({ document: dom.document, context, Node: { ELEMENT_NODE: 1 } });
 	if (options.contextMissing) delete sandbox.context;
 	vm.runInContext(source, sandbox);
 	return { ...dom, sandbox };

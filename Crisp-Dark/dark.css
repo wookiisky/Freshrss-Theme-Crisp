@@ -15,7 +15,12 @@
 	--crisp-control-border: #9caeb6;
 	--crisp-accent: #85e4cf;
 	--crisp-accent-hover: #a2efdf;
+	/* Keep the existing dark action and link colours in the shared roles. */
+	--crisp-primary: #85e4cf;
+	--crisp-primary-hover: #a2efdf;
 	--crisp-on-accent: #102a25;
+	--crisp-link: #85e4cf;
+	--crisp-link-hover: #a2efdf;
 	--crisp-selected: #2a554a;
 	/* Informational surfaces stay quiet while selection carries stronger colour. */
 	--crisp-accent-soft: #25453f;
@@ -25,6 +30,16 @@
 	--crisp-warning: #e9c278;
 	--crisp-warning-bg: #3a3427;
 	--crisp-code: #e6aed0;
+	/* Article hierarchy uses its own palette, independent of interface actions. */
+	--crisp-heading-1: #edb095;
+	--crisp-heading-2: #84cabc;
+	--crisp-heading-3: #9abede;
+	--crisp-heading-4: #a8bdcc;
+	--crisp-heading-5: #b4c0c8;
+	--crisp-heading-6: #bec7cd;
+	--crisp-strong: #edc482;
+	--crisp-highlight-bg: #3c392b;
+	--crisp-highlight-text: #e2d4a7;
 	--crisp-logo-filter: brightness(1.8) saturate(0.7);
 	--crisp-icon-filter: brightness(0) saturate(100%) invert(78%);
 	--crisp-state-icon-filter: brightness(0) saturate(100%) invert(79%) sepia(39%) saturate(615%) hue-rotate(112deg) brightness(93%) contrast(89%);

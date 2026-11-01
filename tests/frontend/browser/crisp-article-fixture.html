@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- Article bodies follow FreshRSS app/views/index/normal.phtml and helpers/index/article.phtml. -->
+<html><head><meta charset="utf-8">
+<style>
+.fixture-decorated::before { content: ""; display: block; height: 8px; background: currentColor; }
+</style>
+</head><body>
+<main id="stream">
+  <article class="flux active">
+    <div class="flux_content"><div class="content">
+      <header><p data-case="header-paragraph" style="margin: 53px 0">Article metadata</p></header>
+      <div class="text">
+        <p data-case="paragraph-first" style="margin: 75px 9px">First paragraph with a <a href="#fixture-anchor">working link</a>.</p>
+        <p data-case="blank-empty"></p>
+        <p data-case="blank-nbsp"> &nbsp; </p>
+        <p data-case="blank-breaks"><span><br><br></span></p>
+        <div data-case="blank-nested"><section><p><span>&nbsp;<br></span></p></section></div>
+        <p data-case="paragraph-second">Second paragraph.</p>
+        <h2 data-case="heading" style="margin: 80px 0">A section heading</h2>
+        <p data-case="single-break">First line<br>Second line</p>
+        <p data-case="double-break">First line<br><br>Second line</p>
+        <p data-case="many-breaks">First line<br><br><br><br><br>Second line</p>
+        <p data-case="wrapped-breaks">First line<br> <span><br><span> &nbsp; <br><br></span></span><br>Second line</p>
+        <p data-case="boundary-breaks"><br>First line<br></p>
+        <p data-case="word-space">first<span> </span>second</p>
+        <p data-case="blank-recoverable">&nbsp;<br></p>
+        <p data-case="code-wrapper"><code data-protected="inline-code">  value<br><br><br><br>next  </code></p>
+        <pre data-protected="pre"><code>function example() {
+    const value = 1;
+
+
+
+    return value;
+}
+</code></pre>
+        <kbd data-protected="kbd">A<br><br><br>B</kbd>
+        <samp data-protected="samp">A<br><br><br>B</samp>
+        <textarea data-protected="textarea">line one
+
+
+    line two</textarea>
+        <div data-protected="pre-wrap" style="white-space: pre-wrap"><p style="margin: 44px 0">line one<br><br><br><br>    line two</p></div>
+        <div data-protected="pre-line" style="white-space: pre-line">line one
+
+
+line two</div>
+        <div data-protected="pre-space" style="white-space: pre">line one
+
+
+    line two</div>
+        <div data-protected="break-spaces" style="white-space: break-spaces">line one
+
+
+    line two</div>
+        <table data-protected="table"><tbody><tr><td><p style="margin: 42px 0">Cell<br><br><br><br>content</p></td></tr></tbody></table>
+        <svg data-protected="svg" width="40" height="10"><path d="M0 5h40" stroke="currentColor" /></svg>
+        <math data-protected="math"><mi>x</mi><mo>=</mo><mn>1</mn></math>
+        <div data-protected="image-wrapper"><p><picture><img data-case="lazy-image" data-original="https://media.invalid/article.png" loading="lazy" width="80" height="40" alt=""></picture></p></div>
+        <p data-protected="video"><video width="80" height="40"></video></p>
+        <p data-protected="audio"><audio controls></audio></p>
+        <p data-protected="iframe"><iframe title="Embedded content" width="80" height="40"></iframe></p>
+        <p data-protected="anchor"><a id="fixture-anchor" name="fixture-anchor"></a></p>
+        <p data-protected="own-anchor" id="fixture-own-anchor">&nbsp;<br></p>
+        <p data-protected="control"><button aria-label="Action"></button></p>
+        <p data-protected="background" style="background: #778899; height: 8px">&nbsp;</p>
+        <p data-protected="border" style="border-bottom: 2px solid">&nbsp;</p>
+        <p data-protected="outline" style="outline: 2px solid">&nbsp;</p>
+        <p data-protected="pseudo" class="fixture-decorated">&nbsp;</p>
+        <div data-protected="layout" style="padding: 25px; margin: 30px 0; min-height: 10px">Custom layout</div>
+      </div>
+      <footer><p data-case="footer-paragraph" style="margin: 57px 0">Article footer</p></footer>
+    </div></div>
+  </article>
+</main>
+<section class="content"><div class="text"><p data-case="outside-article">&nbsp;<br><br><br></p></div></section>
+</body></html>

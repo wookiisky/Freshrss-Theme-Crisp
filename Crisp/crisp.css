@@ -38,11 +38,11 @@ html, body {
 }
 
 a, button.as-link {
-	color: var(--crisp-accent);
+	color: var(--crisp-link);
 }
 
 a:hover, button.as-link:hover {
-	color: var(--crisp-accent-hover);
+	color: var(--crisp-link-hover);
 }
 
 :focus-visible, .btn:focus-visible, input[type="checkbox"]:focus-visible {
@@ -202,17 +202,17 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .btn-important, .btn-important.active {
-	background: var(--crisp-accent);
+	background: var(--crisp-primary);
 	color: var(--crisp-on-accent);
-	border-color: var(--crisp-accent);
+	border-color: var(--crisp-primary);
 	font-weight: 600;
 }
 
 .btn-important:where(:not(:disabled, .disabled)):hover,
 .btn-important:where(:not(:disabled, .disabled)):active {
-	background: var(--crisp-accent-hover);
+	background: var(--crisp-primary-hover);
 	color: var(--crisp-on-accent);
-	border-color: var(--crisp-accent-hover);
+	border-color: var(--crisp-primary-hover);
 }
 
 .btn-important .icon {
@@ -573,7 +573,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 .pagination .item a {
-	color: var(--crisp-accent);
+	color: var(--crisp-link);
 }
 
 #bigMarkAsRead:hover {
@@ -588,7 +588,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 #new-article > a {
 	padding: 0.5rem;
-	color: var(--crisp-accent);
+	color: var(--crisp-link);
 	font-weight: 600;
 }
 
@@ -614,6 +614,12 @@ input:disabled, select:disabled, textarea:disabled {
 .flux.not_read {
 	background: var(--crisp-unread);
 	border-left-color: var(--crisp-accent);
+}
+
+/* The current article returns to the lighter reading surface, even when unread. */
+.flux.not_read:not(.current) {
+	--crisp-link: var(--crisp-accent);
+	--crisp-link-hover: var(--crisp-accent-hover);
 }
 
 .flux.current {
@@ -699,6 +705,59 @@ input:disabled, select:disabled, textarea:disabled {
 
 .content h1, .content h2, .content h3 {
 	line-height: 1.35;
+}
+
+/* Heading colours supplement the existing size, weight and spacing hierarchy. */
+.flux_content .content .text h1 {
+	color: var(--crisp-heading-1);
+}
+
+.flux_content .content .text h2 {
+	color: var(--crisp-heading-2);
+}
+
+.flux_content .content .text h3 {
+	color: var(--crisp-heading-3);
+}
+
+.flux_content .content .text h4 {
+	color: var(--crisp-heading-4);
+}
+
+.flux_content .content .text h5 {
+	color: var(--crisp-heading-5);
+}
+
+.flux_content .content .text h6 {
+	color: var(--crisp-heading-6);
+}
+
+/* Emphasis inside headings, links and rich content keeps its surrounding colour. */
+.flux_content .content .text :is(strong, b):not(:where(
+	h1 *, h2 *, h3 *, h4 *, h5 *, h6 *, a *,
+	pre *, code *, kbd *, samp *, mark *, svg *, math *
+)) {
+	color: var(--crisp-strong);
+}
+
+/* Subdued article highlights keep their own readable light and dark colours. */
+.flux_content .content .text mark {
+	background-color: var(--crisp-highlight-bg);
+	color: var(--crisp-highlight-text);
+}
+
+/* Only ordinary article text receives these marks; preserve source layouts elsewhere. */
+.flux_content .content .text .crisp-paragraph {
+	margin-block: 0.8em !important;
+}
+
+.flux_content .content .text .crisp-heading {
+	margin-block: 1.4em 0.6em !important;
+}
+
+.flux_content .content .text .crisp-empty,
+.flux_content .content .text .crisp-extra-break {
+	display: none !important;
 }
 
 .content hr {
