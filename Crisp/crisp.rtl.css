@@ -747,15 +747,33 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 /* Only ordinary article text receives these marks; preserve source layouts elsewhere. */
+.flux_content .content .text {
+	padding-block: 0;
+}
+
 .flux_content .content .text .crisp-paragraph {
 	margin-block: 0.54em !important;
+}
+
+.flux_content .content .text .crisp-paragraph,
+.flux_content .content .text.crisp-prose,
+.flux_content .content .text .crisp-prose {
 	line-height: 1.395 !important;
+}
+
+.flux_content .content .text .crisp-first-paragraph {
+	margin-block-start: 0 !important;
+}
+
+.flux_content .content .text .crisp-last-paragraph {
+	margin-block-end: 0 !important;
 }
 
 .flux_content .content .text .crisp-heading {
 	margin-block: 1.4em 0.6em !important;
 }
 
+.flux_content .content .text.crisp-empty,
 .flux_content .content .text .crisp-empty,
 .flux_content .content .text .crisp-extra-break {
 	display: none !important;

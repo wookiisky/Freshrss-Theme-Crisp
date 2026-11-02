@@ -9,7 +9,8 @@
 	const blankBlocks = new Set(['P', 'DIV', 'SECTION']);
 	const textWrappers = new Set(['SPAN', 'B', 'STRONG', 'I', 'EM', 'U', 'S', 'SMALL', 'SUB', 'SUP', 'FONT', 'MARK', 'ABBR', 'A']);
 	const preservedWhitespace = new Set(['pre', 'pre-wrap', 'pre-line', 'break-spaces']);
-	const articleMarks = ['crisp-paragraph', 'crisp-heading', 'crisp-empty', 'crisp-extra-break'];
+	const preservedDisplays = new Set(['flex', 'inline-flex', 'grid', 'inline-grid', 'inline-block', 'inline-table', 'ruby', 'ruby-text']);
+	const articleMarks = ['crisp-paragraph', 'crisp-prose', 'crisp-heading', 'crisp-empty', 'crisp-extra-break', 'crisp-first-paragraph', 'crisp-last-paragraph'];
 
 	// Empty painted or anchored elements can still carry content or a navigation target.
 	function hasVisibleDecoration(element, style) {
@@ -22,66 +23,152 @@
 		});
 	}
 
+	// Explicit size and padding can make an empty node a spacer; default paragraph margins cannot.
+	function hasContainerSizing(element, style) {
+		return [style.paddingTop, style.paddingRight, style.paddingBottom, style.paddingLeft]
+			.some(value => parseFloat(value) > 0) || parseFloat(style.minHeight) > 0 ||
+			Boolean(element.style.height && element.style.height !== 'auto');
+	}
+
+	// Custom container spacing remains a source layout, even when its text is ordinary.
+	function hasContainerLayout(element, style) {
+		return [style.marginTop, style.marginRight, style.marginBottom, style.marginLeft]
+			.some(value => parseFloat(value) !== 0) || hasContainerSizing(element, style) || hasVisibleDecoration(element, style);
+	}
+
+	// Both paragraphs and direct prose must preserve the inherited styles of source layouts.
+	function preservesTextLayout(element) {
+		const style = getComputedStyle(element);
+		if (style.display === 'none') return false;
+		return element.matches('pre, code, kbd, samp, textarea, table, [contenteditable], [tabindex], [role]') ||
+			preservedWhitespace.has(style.whiteSpace) || preservedDisplays.has(style.display) || hasContainerLayout(element, style);
+	}
+
 	// Read the original layout first, then apply marks without replacing source nodes or text.
 	function normaliseArticle(body) {
+		body.querySelectorAll('[data-crisp-whitespace]').forEach(wrapper => wrapper.replaceWith(...wrapper.childNodes));
+		body.classList.remove(...articleMarks);
 		body.querySelectorAll(articleMarks.map(name => `.${name}`).join(',')).forEach(element => element.classList.remove(...articleMarks));
 		const marks = [];
+		const contentEdges = [];
+		const emptyWrappers = [];
+		const hiddenWhitespace = [];
 
-		// Inline wrappers share a break counter; block boundaries and protected content reset it.
+		// Only a break between two pieces of inline content has a visible purpose.
+		function finishFlow(flow, hasContent = false) {
+			const keep = hasContent && flow.hasContent ? 1 : 0;
+			for (const br of flow.breaks.slice(keep)) marks.push([br, 'crisp-extra-break']);
+			if (!keep) {
+				for (const node of flow.whitespace) {
+					if (node.nodeType === Node.ELEMENT_NODE) marks.push([node, 'crisp-empty']);
+					else if (/[^\t\n\f\r ]/.test(node.textContent)) hiddenWhitespace.push(node);
+				}
+			}
+			flow.breaks = [];
+			flow.whitespace = [];
+			flow.hasContent = hasContent;
+		}
+
+		// Inline wrappers share pending breaks; each block owns a separate text flow.
 		function visit(node, flow) {
 			if (node.nodeType === Node.TEXT_NODE) {
 				const blank = node.textContent.trim() === '';
-				if (!blank) flow.breaks = 0;
+				if (!blank) {
+					finishFlow(flow, true);
+					flow.hasText = true;
+					contentEdges.push(node.parentElement);
+				} else flow.whitespace.push(node);
 				return blank;
 			}
 			if (node.nodeType === Node.COMMENT_NODE) return true;
 			if (node.nodeType !== Node.ELEMENT_NODE) return false;
 
 			const style = getComputedStyle(node);
-			if (node.matches(preservedElements) || preservedWhitespace.has(style.whiteSpace)) {
-				flow.breaks = 0;
+			if (style.display === 'none') return true;
+			const block = node.tagName !== 'BR' && !style.display.startsWith('inline') && !['contents', 'ruby', 'ruby-text'].includes(style.display);
+			if (node.matches(preservedElements) || preservedWhitespace.has(style.whiteSpace) ||
+				preservedDisplays.has(style.display)) {
+				finishFlow(flow, !block);
+				contentEdges.push(node);
+				if (!block && node.textContent.trim()) flow.hasText = true;
 				return false;
 			}
 
-			const block = node.tagName !== 'BR' && !['inline', 'contents'].includes(style.display);
 			const candidate = node !== body && (blankBlocks.has(node.tagName) || textWrappers.has(node.tagName) || node.tagName === 'BR');
 			const anchored = node !== body && Boolean(node.id || node.getAttribute('name') || node.getAttribute('aria-label') || node.getAttribute('aria-labelledby'));
 			const heading = /^H[1-6]$/.test(node.tagName);
 			const emptyText = node.textContent.trim() === '';
 			const decorated = ((candidate && (emptyText || node.tagName === 'P')) || heading) && hasVisibleDecoration(node, style);
-			if ((anchored && emptyText) || decorated) {
-				flow.breaks = 0;
+			// Protect the complete spacer before visiting children that contribute to its height.
+			const sizedSpacer = candidate && emptyText && hasContainerSizing(node, style);
+			if ((anchored && emptyText) || decorated || sizedSpacer) {
+				finishFlow(flow, !block);
+				contentEdges.push(node);
 				return false;
 			}
 
 			if (node.tagName === 'BR') {
-				if (++flow.breaks > 2) marks.push([node, 'crisp-extra-break']);
+				// A clearing break ends a float layout, rather than adding an ordinary blank line.
+				if (style.clear !== 'none') {
+					finishFlow(flow);
+					contentEdges.push(node);
+					return false;
+				}
+				flow.breaks.push(node);
 				return true;
 			}
 
-			if (block) flow.breaks = 0;
-			const innerFlow = block ? { breaks: 0 } : flow;
-			let blank = candidate && !anchored;
+			if (block) finishFlow(flow);
+			const innerFlow = block ? { breaks: [], whitespace: [], hasContent: false, hasText: false } : flow;
+			let blank = node === body || (candidate && !anchored);
 			for (const child of node.childNodes) {
 				if (!visit(child, innerFlow)) blank = false;
 			}
-			if (block) flow.breaks = 0;
+			if (block) finishFlow(innerFlow);
 
-			if (blank && blankBlocks.has(node.tagName)) marks.push([node, 'crisp-empty']);
+			if (blank && (blankBlocks.has(node.tagName) || node === body)) {
+				if (node !== body || !hasVisibleDecoration(node, style)) marks.push([node, 'crisp-empty']);
+			} else if (blank && textWrappers.has(node.tagName)) {
+				emptyWrappers.push(node);
+				flow.whitespace.push(node);
+			}
 			if (['block', 'flow-root'].includes(style.display) && !node.querySelector(layoutElements)) {
 				if (node.tagName === 'P') {
 					// A paragraph must not change the line height inherited by protected text inside it.
-					const preservesText = [...node.querySelectorAll('*')].some(child =>
-						child.matches('pre, code, kbd, samp') || preservedWhitespace.has(getComputedStyle(child).whiteSpace));
+					const preservesText = [...node.querySelectorAll('*')].some(preservesTextLayout);
 					if (!preservesText) marks.push([node, 'crisp-paragraph']);
 				}
 				else if (heading) marks.push([node, 'crisp-heading']);
 			}
+			// Direct text also occurs at the article root and in simple source containers.
+			if (block && innerFlow.hasText && (node === body || ['DIV', 'SECTION'].includes(node.tagName))) {
+				const simple = node === body || !hasContainerLayout(node, style);
+				const preservesText = [...node.querySelectorAll('*')].some(preservesTextLayout);
+				if (simple && !preservesText) marks.push([node, 'crisp-prose']);
+			}
 			return blank;
 		}
 
-		visit(body, { breaks: 0 });
+		visit(body, { breaks: [], whitespace: [], hasContent: false, hasText: false });
+		const hiddenBreaks = new Set(marks.filter(([, name]) => name === 'crisp-extra-break').map(([element]) => element));
+		for (const wrapper of emptyWrappers) {
+			const breaks = [...wrapper.querySelectorAll('br')];
+			if (breaks.length && breaks.every(br => hiddenBreaks.has(br))) marks.push([wrapper, 'crisp-empty']);
+		}
 		for (const [element, name] of marks) element.classList.add(name);
+		// A bare non-breaking space has no element to hide; keep its original text node in a reversible wrapper.
+		for (const node of hiddenWhitespace) {
+			if (node.parentElement.closest('.crisp-empty')) continue;
+			const wrapper = document.createElement('span');
+			wrapper.dataset.crispWhitespace = '';
+			wrapper.classList.add('crisp-empty');
+			node.before(wrapper);
+			wrapper.appendChild(node);
+		}
+		for (const [edge, name] of [[contentEdges[0], 'crisp-first-paragraph'], [contentEdges.at(-1), 'crisp-last-paragraph']]) {
+			const paragraph = edge?.closest('p');
+			if (paragraph?.classList.contains('crisp-paragraph')) paragraph.classList.add(name);
+		}
 	}
 
 	// Restrict every pass to article bodies, including content replaced in an existing body.
