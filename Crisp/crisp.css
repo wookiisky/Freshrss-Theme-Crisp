@@ -113,7 +113,7 @@ input, select, textarea {
 	color: var(--crisp-text);
 	font-size: 1rem;
 	border: 1px solid var(--crisp-control-border);
-	border-radius: 0.35rem;
+	border-radius: 0;
 	box-sizing: border-box;
 	line-height: 1.4;
 	accent-color: var(--crisp-accent);
@@ -139,7 +139,7 @@ input:disabled, select:disabled, textarea:disabled {
 
 .form-group {
 	padding: 0.5rem;
-	border-radius: 0.35rem;
+	border-radius: 0;
 }
 
 .form-group .group-name,
@@ -170,7 +170,7 @@ input:disabled, select:disabled, textarea:disabled {
 	color: var(--crisp-text);
 	font-size: 0.9375rem;
 	border: 1px solid var(--crisp-control-border);
-	border-radius: 0.35rem;
+	border-radius: 0;
 	box-shadow: none;
 	box-sizing: border-box;
 	line-height: 1.5rem;
@@ -256,23 +256,9 @@ input:disabled, select:disabled, textarea:disabled {
 	filter: var(--crisp-icon-filter);
 }
 
-.stick > input, .stick > .btn,
-.group > .btn, .group > .dropdown > .btn {
+/* Keep native controls and the switch thumb square as well as themed buttons. */
+button, .switch, .switch::before, kbd, #popup-content, .preview_controls {
 	border-radius: 0;
-}
-
-.stick > :first-child, .group > .btn:first-child,
-.group > .dropdown:first-child > .btn {
-	border-radius: 0.35rem 0 0 0.35rem;
-}
-
-.stick > :last-child, .group > .btn:last-child,
-.group > .dropdown:last-child > .btn {
-	border-radius: 0 0.35rem 0.35rem 0;
-}
-
-.stick > :only-child, .group > .btn:only-child {
-	border-radius: 0.35rem;
 }
 
 .switch.active {
@@ -393,21 +379,54 @@ input:disabled, select:disabled, textarea:disabled {
 	margin: 0.5rem 0 1rem;
 }
 
+/* Let titles shrink while counts take only their formatted text width. */
+.aside.aside_feed .tree-folder-title > .title,
+.aside.aside_feed .feed > .item-title {
+	display: flex;
+	flex: 1;
+	width: auto;
+	min-width: 0;
+	align-items: center;
+	gap: 0.35rem;
+}
+
+.aside.aside_feed .crisp-category-label,
+.aside.aside_feed .feed .item-title > .title {
+	flex: 1;
+	min-width: 0;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.aside.aside_feed .feed > .item-title {
+	padding-inline: 0 0.65rem;
+	box-sizing: border-box;
+}
+
+.aside.aside_feed .feed .item-title > .favicon {
+	flex-shrink: 0;
+}
+
 .aside.aside_feed .category .title:not([data-unread="0"])::after,
 .aside.aside_feed .feed .item-title:not([data-unread="0"])::after {
 	margin: 0;
-	background: var(--crisp-raised);
+	padding: 0;
+	min-width: 0;
+	flex-shrink: 0;
+	position: static;
+	background: transparent;
+	border: 0;
 	color: var(--crisp-muted);
 	font-size: 0.8125rem;
-	border-radius: 0.25rem;
-	top: 50%;
-	transform: translateY(-50%);
+	border-radius: 0;
+	transform: none;
 	font-weight: 400;
+	text-align: end;
 }
 
 .aside.aside_feed .tree-folder.active > .tree-folder-title .title:not([data-unread="0"])::after,
 .aside.aside_feed .tree-folder-items > .item.active .item-title:not([data-unread="0"])::after {
-	background: var(--crisp-surface);
 	color: var(--crisp-accent);
 }
 
@@ -460,7 +479,7 @@ input:disabled, select:disabled, textarea:disabled {
 	padding: 0.4rem 0;
 	font-size: 0.9375rem;
 	border: 1px solid var(--crisp-border);
-	border-radius: 0.4rem;
+	border-radius: 0;
 	box-shadow: var(--crisp-menu-shadow);
 	text-align: left;
 }
@@ -504,7 +523,7 @@ input:disabled, select:disabled, textarea:disabled {
 	color: var(--crisp-text);
 	font-size: 0.9375rem;
 	border: 1px solid var(--crisp-border);
-	border-radius: 0.35rem;
+	border-radius: 0;
 	box-shadow: none;
 	text-shadow: none;
 }
@@ -538,14 +557,14 @@ input:disabled, select:disabled, textarea:disabled {
 
 .box {
 	border: 1px solid var(--crisp-border);
-	border-radius: 0.4rem;
+	border-radius: 0;
 }
 
 .box .box-title {
 	background: var(--crisp-raised);
 	color: var(--crisp-text);
 	border-bottom: 1px solid var(--crisp-border);
-	border-radius: 0.4rem 0.4rem 0 0;
+	border-radius: 0;
 }
 
 .box.category:not([data-unread="0"]) .box-title {
@@ -574,6 +593,20 @@ input:disabled, select:disabled, textarea:disabled {
 
 .pagination .item a {
 	color: var(--crisp-link);
+}
+
+/* Keep the end-of-stream action to three text lines without a viewport-sized tail. */
+#bigMarkAsRead.big {
+	margin: 0;
+	padding: 0.5rem 0.75rem;
+	font-size: 1rem;
+	line-height: 1.4;
+	box-sizing: border-box;
+}
+
+#bigMarkAsRead.big .bigTick {
+	font-size: 1.25rem;
+	line-height: 1;
 }
 
 #bigMarkAsRead:hover {
@@ -690,6 +723,20 @@ input:disabled, select:disabled, textarea:disabled {
 	overflow-wrap: anywhere;
 }
 
+/* Keep article edges compact and let short entries follow their content height. */
+.flux_content > .content {
+	padding-block: 0.5rem;
+	min-height: 0;
+}
+
+.flux_content > .content > header {
+	padding-block-start: 0.25rem;
+}
+
+.flux_content > .content > footer {
+	padding-block-end: 0.25rem;
+}
+
 .content > h1.title > a,
 .content header .title > a {
 	color: var(--crisp-text);
@@ -791,7 +838,7 @@ input:disabled, select:disabled, textarea:disabled {
 	background: var(--crisp-raised);
 	color: var(--crisp-text);
 	border: 1px solid var(--crisp-border);
-	border-radius: 0.35rem;
+	border-radius: 0;
 	line-height: 1.5;
 }
 
@@ -799,7 +846,7 @@ input:disabled, select:disabled, textarea:disabled {
 	background: var(--crisp-raised);
 	color: var(--crisp-code);
 	border-color: var(--crisp-border);
-	border-radius: 0.2rem;
+	border-radius: 0;
 }
 
 .content pre code {
@@ -826,6 +873,7 @@ input:disabled, select:disabled, textarea:disabled {
 }
 
 #stream.reader .flux .flux_content {
+	padding-block: 0.5rem;
 	border-color: var(--crisp-border);
 }
 

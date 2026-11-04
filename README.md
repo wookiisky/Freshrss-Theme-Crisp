@@ -22,20 +22,21 @@ Ink-grey surfaces, soft light text and teal accents. The screenshot uses sample 
 
 ## Design
 
-Crisp starts from FreshRSS's bundled Flat design theme and uses surface colours, fine dividers and small corner radii to distinguish interface elements.
+Crisp starts from FreshRSS's bundled Flat design theme and uses surface colours, fine dividers and square corners to distinguish interface elements.
 Both editions share component styles and layout, with separate palettes for a consistent reading experience.
 
 - **Compact lists**: less vertical space in feed and article lists, larger text and comfortable article line spacing.
 - **Article colour hierarchy**: light articles use warm brown, teal and blue-grey headings with golden-brown bold text; dark articles use soft coral, pale teal and misty blue headings with pale-gold bold text. H1–H6 have separate colours, with lower levels converging towards blue-grey while retaining their existing size, weight and spacing. Highlights use a pale-wheat background with dark-brown text in light mode, and a dark olive-gold background with pale-beige text in dark mode. Italics keep their surrounding colour; bold text inside headings, links, code and highlights keeps its context colour. Source inline colours remain intact.
 - **Article spacing**: ordinary paragraphs use a `1.395` line height and `0.54em` above and below. Direct article text and simple text containers use the same line height. Article bodies have no vertical padding; when the first or last content belongs to an ordinary paragraph, its outward margin is also removed. Article headings use `1.4em` above and `0.6em` below. Empty paragraphs and simple containers containing only whitespace, `&nbsp;` or breaks are hidden. Leading and trailing breaks in articles and ordinary blocks are hidden; consecutive breaks between content become a single line break without an extra blank line. Paragraphs containing code or preformatted text retain their original spacing and inherited line height.
-- **Simpler subscription sidebar**: paused subscriptions are hidden, and feed errors use ordinary text without warning icons on feeds or categories. Error details remain in feed tooltips, and paused subscriptions remain available in management.
+- **Simpler subscription sidebar**: unread counts have no background, align to the trailing edge and reserve only their text width. Paused subscriptions are hidden, and feed errors use ordinary text without warning icons on feeds or categories. Error details remain in feed tooltips, and paused subscriptions remain available in management.
 - **Combined header**: search and reading controls share one toolbar, wrapping on narrow screens or when zoomed in. A 2px divider clearly separates the toolbar from the reading area.
 - **Simpler date grouping**: date headings and jump links are hidden when sorting by reception, publication or modification time. Article dates, feed groups and category groups remain available.
 - **Clear hover feedback**: the light theme uses a darker warm-grey fill and the dark theme a brighter blue-grey fill on buttons, navigation, menus and article headers.
 - **Selection**: navigation and the current article keep their selection backgrounds and edge markers on hover. Button selection changes only the border colour, preserving the normal text, icons and background; hover, pressing and keyboard focus retain their own feedback.
 - **Reading states**: read and unread articles use different backgrounds with the same font weight. The current article keeps its accent edge even when starred, while stars and read/unread icons retain their meaning. Informational messages retain softer backgrounds.
 - **Recognisable controls**: buttons and inputs have stronger outlines than list dividers. Press feedback is immediate; disabled controls keep any persistent selection without responding to hover. Colour transitions respect reduced-motion preferences.
-- **Fixed palettes**: select the light or dark edition in FreshRSS; neither follows the operating system's colour preference.
+- **Compact stream footer**: the large “mark all as read” action uses a small tick and about three lines of height, without extra viewport-sized blank space.
+- **Fixed palettes**: pale ivory surfaces in the light edition; select the light or dark edition in FreshRSS; neither follows the operating system's colour preference.
 - **RTL support**: generated stylesheets are included for languages written from right to left.
 
 Article cleanup only affects content displayed on FreshRSS web pages; it does not rewrite the database or feeds, or change third-party clients.

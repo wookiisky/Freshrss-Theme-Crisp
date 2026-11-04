@@ -197,6 +197,14 @@
 	// The initial pass also covers the reading view, where articles are already expanded.
 	function initialiseTheme() {
 		initialiseToolbar();
+		// Separate category text from its counter so flex layout can truncate only the label.
+		document.querySelectorAll('.aside_feed .tree-folder-title > .title').forEach(title => {
+			if (title.querySelector('.crisp-category-label')) return;
+			const label = document.createElement('span');
+			label.className = 'crisp-category-label';
+			label.append(...title.childNodes);
+			title.append(label);
+		});
 		normaliseArticles(document);
 	}
 

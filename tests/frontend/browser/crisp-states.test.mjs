@@ -90,6 +90,70 @@ async function colour(page, role) {
 for (const theme of ['light', 'dark']) for (const direction of ['ltr', 'rtl']) {
 	const label = `${theme}/${direction}`;
 
+	test(`${label}: sidebar counts reserve only their text width and stay clear of titles`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			await page.evaluate(() => document.querySelector('#fixture-aside').append(document.querySelector('#fixture-tree')));
+			await page.addScriptTag({ content: readFileSync(join(root, 'Crisp/crisp.js'), 'utf8') });
+			await page.evaluate(() => {
+				for (const label of document.querySelectorAll('.crisp-category-label, #feed-selected .title')) label.textContent = '很长的订阅标题，用于确认标题和未读数字不会相互遮挡';
+			});
+			await page.addScriptTag({ content: readFileSync(join(root, 'Crisp/crisp.js'), 'utf8') });
+			assert.equal(await page.locator('.crisp-category-label').count(), 1, 'reinitialising keeps a single label and the original counter owner');
+			for (const width of [1440, 390]) {
+				await page.setViewportSize({ width, height: 900 });
+				for (const selector of ['#folder-title > .title', '#feed-selected > .item-title']) {
+					const widths = [];
+					for (const count of ['1', '99', '1,234,567']) {
+						await page.locator(selector).evaluate((element, value) => { element.dataset.unread = value; delete element.dataset.unreadHide; }, count);
+						const layout = await page.locator(selector).evaluate(element => {
+							const style = getComputedStyle(element, '::after');
+							const label = element.querySelector('.crisp-category-label, .title');
+							const bounds = element.getBoundingClientRect(), text = label?.getBoundingClientRect();
+							return { width: parseFloat(style.width), padding: style.padding, background: style.backgroundColor,
+								position: style.position, clipped: label && label.scrollWidth > label.clientWidth,
+								gap: text && (document.dir === 'rtl' ? text.left - bounds.left : bounds.right - text.right) };
+						});
+						assert.equal(layout.background, 'rgba(0, 0, 0, 0)');
+						assert.equal(layout.padding, '0px');
+						assert.equal(layout.position, 'static');
+						assert.ok(layout.gap >= layout.width, 'title ends before the count');
+						assert.ok(layout.clipped, 'long labels shrink to keep the count visible');
+						widths.push(layout.width);
+					}
+					assert.ok(widths[0] < widths[1] && widths[1] < widths[2], `${selector} widths follow digits: ${widths}`);
+					await page.locator(selector).evaluate(element => element.dataset.unread = '0');
+					assert.equal(await page.locator(selector).evaluate(element => getComputedStyle(element, '::after').content), 'none');
+					await page.locator(selector).evaluate(element => { element.dataset.unread = '12'; element.dataset.unreadHide = '1'; });
+					assert.equal(await page.locator(selector).evaluate(element => getComputedStyle(element, '::after').content), '"·"');
+				}
+			}
+		} finally { await page.close(); }
+	});
+
+	test(`${label}: controls have square corners and the stream footer stays compact`, async () => {
+		const page = await openFixture(theme, direction);
+		try {
+			await page.evaluate(() => document.body.insertAdjacentHTML('beforeend', '<button class="switch active" aria-label="Switch"></button><select aria-label="Select"><option>One</option></select><textarea aria-label="Notes"></textarea><button id="bigMarkAsRead" class="as-link big"><span class="bigTick">✓</span><br><span class="markAllRead">Mark all as read</span><br><span class="jumpNext">Jump to the next unread item</span></button>'));
+			for (const selector of ['.btn', 'input', 'select', 'textarea', '.switch', '.dropdown-menu']) {
+				for (const radii of await page.locator(selector).evaluateAll(elements => elements.map(element => {
+					const style = getComputedStyle(element);
+					return ['borderTopLeftRadius', 'borderTopRightRadius', 'borderBottomLeftRadius', 'borderBottomRightRadius'].map(key => style[key]);
+				}))) assert.deepEqual(radii, ['0px', '0px', '0px', '0px'], selector);
+			}
+			assert.equal(await page.locator('.switch').evaluate(element => getComputedStyle(element, '::before').borderRadius), '0px');
+			for (const width of [1440, 390]) {
+				await page.setViewportSize({ width, height: 900 });
+				const footer = await page.locator('#bigMarkAsRead').evaluate(element => {
+					const style = getComputedStyle(element);
+					return { height: element.offsetHeight, margin: style.marginBottom, line: parseFloat(style.lineHeight), padding: parseFloat(style.paddingTop) + parseFloat(style.paddingBottom) };
+				});
+				assert.ok(footer.height <= footer.line * 3 + footer.padding + 2, 'footer fits three lines plus padding');
+				assert.equal(footer.margin, '0px', 'footer adds no viewport-sized blank space');
+			}
+		} finally { await page.close(); }
+	});
+
 	test(`${label}: paused subscriptions are hidden only in the reading sidebar`, async () => {
 		const page = await openFixture(theme, direction);
 		try {

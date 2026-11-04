@@ -1,16 +1,16 @@
 @charset "UTF-8";
 
-/* Fixed light palette, independent of the operating system preference. */
+/* Pale ivory surfaces, independent of the operating system preference. */
 :root {
-	--crisp-bg: #efebe4;
-	--crisp-surface: #f4f1eb;
-	--crisp-sidebar: #f1ede6;
-	--crisp-raised: #eee9e1;
-	--crisp-hover: #bfae96;
+	--crisp-bg: #f6f5eb;
+	--crisp-surface: #faf9f2;
+	--crisp-sidebar: #f7f6ed;
+	--crisp-raised: #efeee2;
+	--crisp-hover: #bbb097;
 	--crisp-text: #302a25;
 	--crisp-muted: #4d4035;
 	/* Quiet separators and stronger control outlines serve different roles. */
-	--crisp-border: #e9e4dd;
+	--crisp-border: #e7e5d7;
 	--crisp-list-divider: #c9bfb1;
 	--crisp-control-border: #665a4d;
 	--crisp-accent: #733000;
@@ -24,7 +24,7 @@
 	--crisp-selected: #ffad33;
 	/* Informational surfaces stay quiet while selection carries stronger colour. */
 	--crisp-accent-soft: #faedda;
-	--crisp-unread: #ddd4c6;
+	--crisp-unread: #dcd7c5;
 	--crisp-danger: #b5323e;
 	--crisp-danger-bg: #fbe9ec;
 	--crisp-warning: #805514;
